@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absensi Guru — Idadiyah al-Miftah</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root {
+  --hijau-tua:#1a3a2a; --hijau:#2d6a4f; --hijau-muda:#40916c; --hijau-terang:#52b788;
+  --emas:#c9a84c; --emas-muda:#f0d080; --krem:#fdf6e3; --putih:#fff;
+  --merah:#c0392b; --merah-bg:#fce4ec; --kuning:#e67e22; --biru:#2980b9;
+  --abu:#6c757d; --border:#e5e0d5; --sw:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--krem);color:#1a1a1a;display:flex;min-height:100vh}
+
+/* =============================================
+   SIDEBAR
+   ============================================= */
+.sb{width:var(--sw);background:var(--hijau-tua);min-height:100vh;display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;transition:transform .25s ease}
+.sb-logo{padding:20px;border-bottom:1px solid rgba(201,168,76,.2);text-align:center}
+.sb-logo .ar{font-family:'Amiri',serif;color:var(--emas);font-size:21px;display:block;margin-bottom:3px}
+.sb-logo .nm{color:#fff;font-size:12.5px;font-weight:700}
+.sb-logo .sb2{color:rgba(255,255,255,.4);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+.sb-nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:2px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 13px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.58);font-size:13px;font-weight:500;transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.ni:hover{background:rgba(255,255,255,.08);color:#fff}
+.ni.on{background:var(--emas);color:var(--hijau-tua);font-weight:700}
+.ni .ic{font-size:15px;min-width:18px}
+.sb-ft{padding:12px;border-top:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);font-size:10.5px;text-align:center;line-height:1.5}
+
+/* Overlay untuk mobile */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99}
+
+/* MAIN */
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:12px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-title{font-size:16px;font-weight:700;color:var(--hijau-tua)}
+.tb-right{display:flex;align-items:center;gap:10px}
+.st-badge{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;font-size:11.5px;font-weight:600}
+.st-badge.ok{background:#e8f5e9;color:#2e7d32}
+.st-badge.no{background:#fce4ec;color:#c62828}
+.st-badge .dot{width:7px;height:7px;border-radius:50%}
+.st-badge.ok .dot{background:#43a047;animation:pulse 2s infinite}
+.st-badge.no .dot{background:#e53935}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tgl-top{font-size:12.5px;color:var(--abu);font-weight:500}
+.content{padding:22px 26px;flex:1}
+.page{display:none}.page.active{display:block}
+
+/* Hamburger button (mobile) */
+.ham-btn{display:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:none;background:var(--krem);cursor:pointer;font-size:18px;color:var(--hijau-tua)}
+
+/* CARD */
+.card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:18px}
+.ch{padding:14px 18px;border-bottom:1px solid #f0ebe0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.ct{font-size:13.5px;font-weight:700;color:var(--hijau-tua)}
+.cs{font-size:11.5px;color:var(--abu);margin-top:2px}
+table{width:100%;border-collapse:collapse}
+th{background:var(--krem);padding:9px 14px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--abu);border-bottom:1px solid var(--border)}
+td{padding:10px 14px;font-size:13px;border-bottom:1px solid #f5f0e8;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fdf8f0}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.badge.H{background:#e8f5e9;color:#2e7d32}
+.badge.A{background:#fce4ec;color:#c62828}
+.badge.I{background:#fff8e1;color:#f57f17}
+.badge.S{background:#e3f2fd;color:#1565c0}
+.empty{text-align:center;padding:36px;color:var(--abu)}
+.empty .ic{font-size:32px;margin-bottom:8px}
+.empty p{font-size:12.5px}
+
+/* STATS */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:13px;margin-bottom:20px}
+.sc{background:#fff;border-radius:12px;padding:16px;border:1px solid var(--border);position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sc.h::before{background:var(--hijau)}
+.sc.a::before{background:var(--merah)}
+.sc.t::before{background:var(--emas)}
+.sc.p::before{background:var(--biru)}
+.sc-ic{font-size:20px;margin-bottom:7px}
+.sc-lb{font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--abu);margin-bottom:4px}
+.sc-val{font-size:28px;font-weight:700;color:var(--hijau-tua);line-height:1}
+.sc-desc{font-size:10.5px;color:var(--abu);margin-top:3px}
+
+/* CHECK-IN */
+.ci-wrap{display:grid;grid-template-columns:1fr 290px;gap:18px;align-items:start}
+.ci-box{background:var(--hijau-tua);border-radius:16px;padding:32px 38px;text-align:center;position:relative;overflow:hidden}
+.ci-box::before{content:'';position:absolute;top:-40px;right:-40px;width:170px;height:170px;border-radius:50%;background:rgba(201,168,76,.06)}
+.ci-box::after{content:'';position:absolute;bottom:-50px;left:-25px;width:200px;height:200px;border-radius:50%;background:rgba(64,145,108,.09)}
+.ci-ar{font-family:'Amiri',serif;color:var(--emas);font-size:26px;display:block;margin-bottom:3px}
+.ci-sub{color:rgba(255,255,255,.45);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.ci-jam{color:rgba(255,255,255,.9);font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:3px}
+.ci-tgl{color:rgba(255,255,255,.4);font-size:12px;margin-bottom:26px}
+.ci-lbl{color:rgba(255,255,255,.5);font-size:10.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:9px;text-align:left;position:relative;z-index:1}
+.ci-inp{width:100%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.18);border-radius:10px;padding:14px 18px;color:#fff;font-size:24px;font-weight:700;letter-spacing:3px;outline:none;font-family:inherit;text-align:center;transition:all .2s;position:relative;z-index:1}
+.ci-inp:focus{border-color:var(--emas);background:rgba(255,255,255,.15)}
+.ci-inp::placeholder{color:rgba(255,255,255,.22);font-size:13px;letter-spacing:1px;font-weight:400}
+.ci-hint{color:rgba(255,255,255,.35);font-size:11.5px;margin-top:9px;position:relative;z-index:1}
+.ci-fb{border-radius:12px;padding:18px 22px;margin-top:18px;display:none;position:relative;z-index:1;text-align:left}
+.ci-fb.ok{background:rgba(46,125,50,.2);border:1.5px solid rgba(46,125,50,.38);display:block}
+.ci-fb.err{background:rgba(198,40,40,.16);border:1.5px solid rgba(198,40,40,.32);display:block}
+.fb-nm{color:#fff;font-size:20px;font-weight:700;margin-bottom:3px}
+.fb-dt{color:rgba(255,255,255,.55);font-size:12.5px}
+.fb-bd{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 13px;font-size:12px;font-weight:700;margin-top:9px}
+.fb-bd.hadir{background:rgba(46,125,50,.28);color:#a5d6a7}
+.fb-bd.sudah{background:rgba(201,168,76,.18);color:var(--emas-muda)}
+.fb-bd.notfound{background:rgba(198,40,40,.22);color:#ef9a9a}
+
+/* SIDE PANEL */
+.ci-side{display:flex;flex-direction:column;gap:13px}
+.ss{background:#fff;border-radius:12px;border:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.ss-ic{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px}
+.ss-ic.g{background:#e8f5e9}.ss-ic.e{background:#fff8e1}.ss-ic.r{background:#fce4ec}
+.ss-val{font-size:24px;font-weight:700;color:var(--hijau-tua);line-height:1}
+.ss-lb{font-size:11.5px;color:var(--abu);margin-top:2px}
+.log-card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.log-hd{padding:11px 15px;border-bottom:1px solid var(--border);font-size:12.5px;font-weight:700;color:var(--hijau-tua)}
+.log-list{max-height:320px;overflow-y:auto}
+.log-item{padding:9px 15px;border-bottom:1px solid #f5f0e8;display:flex;align-items:center;gap:9px;animation:si .25s ease}
+@keyframes si{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.log-item:last-child{border-bottom:none}
+.log-av{width:30px;height:30px;border-radius:7px;background:var(--hijau);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.log-nm{font-size:12.5px;font-weight:600;color:var(--hijau-tua)}
+.log-sb{font-size:11px;color:var(--abu);margin-top:1px}
+.log-empty{padding:18px;text-align:center;color:var(--abu);font-size:12.5px}
+
+/* BUTTONS */
+.btn{padding:8px 18px;border-radius:8px;border:none;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .18s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.btn-g{background:var(--hijau);color:#fff}.btn-g:hover{background:var(--hijau-muda);transform:translateY(-1px)}
+.btn-g:disabled{background:#ccc;cursor:not-allowed;transform:none}
+.btn-e{background:var(--emas);color:var(--hijau-tua)}.btn-e:hover{background:var(--emas-muda)}
+.btn-r{background:var(--merah);color:#fff}
+
+/* SESI HIJRIAH */
+.sesi-box{background:var(--hijau-tua);border-radius:14px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.sesi-box.aktif{background:linear-gradient(135deg,#1a3a2a,#2d5a3d)}
+.sesi-info{flex:1}
+.sesi-label{color:rgba(255,255,255,.5);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.sesi-tgl{font-family:'Amiri',serif;color:var(--emas);font-size:22px;font-weight:700}
+.sesi-tgl-m{color:rgba(255,255,255,.4);font-size:11.5px;margin-top:2px}
+.sesi-status{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700}
+.sesi-status.buka{background:rgba(67,160,71,.25);color:#a5d6a7;border:1px solid rgba(67,160,71,.4)}
+.sesi-status.tutup{background:rgba(198,40,40,.2);color:#ef9a9a;border:1px solid rgba(198,40,40,.3)}
+.sesi-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-sesi{padding:9px 16px;border-radius:8px;border:none;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-buka{background:var(--emas);color:var(--hijau-tua)}
+.btn-buka:hover{background:var(--emas-muda)}
+.btn-tutup-sesi{background:rgba(198,40,40,.25);color:#ef9a9a;border:1px solid rgba(198,40,40,.4)!important}
+.btn-tutup-sesi:hover{background:rgba(198,40,40,.4)}
+.input-hijri{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;font-family:'Amiri',serif;outline:none;width:52px;text-align:center}
+.input-hijri:focus{border-color:var(--emas)}
+.select-hijri{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;outline:none;cursor:pointer}
+.select-hijri option{background:#1a3a2a;color:#fff}
+.select-hijri:focus{border-color:var(--emas)}
+
+/* =============================================
+   REKAP KALENDER
+   ============================================= */
+.rekap-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid var(--border);background:#fff}
+.rekap-toolbar select,.rekap-toolbar input[type=number]{border:1.5px solid #ddd;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;background:#fff;color:#1a1a1a}
+.rekap-judul{font-family:'Amiri',serif;color:var(--hijau-tua);font-size:18px;font-weight:700;padding:10px 18px 0;text-align:center}
+.rekap-sub{text-align:center;font-size:11.5px;color:var(--abu);padding-bottom:10px}
+.rekap-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl-rekap{border-collapse:separate;border-spacing:0;min-width:700px;width:100%}
+.tbl-rekap .col-no{width:40px;min-width:40px}
+.tbl-rekap .col-idpps{min-width:90px}
+.tbl-rekap .col-nama{min-width:160px}
+.tbl-rekap .col-dom{min-width:55px}
+.tbl-rekap .col-tk{min-width:80px}
+.rk-th-hari{background:var(--hijau-tua);color:#fff;text-align:center;padding:7px 4px;font-size:11px;font-weight:700;min-width:34px;border-right:1px solid rgba(255,255,255,.1)}
+.rk-th-hari:last-child{border-right:none}
+.rk-th-namahari{background:#1e4535;color:rgba(255,255,255,.6);text-align:center;padding:4px 4px 7px;font-size:9.5px;font-weight:600;letter-spacing:.5px;min-width:34px;border-right:1px solid rgba(255,255,255,.08);border-bottom:2px solid var(--emas)}
+.rk-th-namahari:last-child{border-right:none}
+.rk-th-kiri{background:var(--krem);color:var(--abu);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 10px;border-bottom:2px solid var(--emas);text-align:left;white-space:nowrap;vertical-align:bottom}
+.rk-th-kiri.center{text-align:center}
+.rk-th-stat{background:var(--krem);font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:8px 6px;border-bottom:2px solid var(--emas);text-align:center;white-space:nowrap;vertical-align:bottom}
+.tbl-rekap tbody tr:hover td{background:#fdf8f0}
+.tbl-rekap tbody tr:last-child td{border-bottom:none}
+.rk-td{padding:7px 10px;font-size:12.5px;border-bottom:1px solid #f0ebe0;vertical-align:middle;white-space:nowrap}
+.rk-td.nama{font-weight:600}
+.rk-td.center{text-align:center}
+.rk-td.code{font-family:monospace;font-size:11.5px;color:var(--abu)}
+.rk-cell{display:inline-flex;align-items:center;justify-content:center;width:30px;height:24px;border-radius:5px;font-size:10.5px;font-weight:700;cursor:default}
+.rk-cell.H{background:#e8f5e9;color:#2e7d32}
+.rk-cell.A{background:#fce4ec;color:#c62828}
+.rk-cell.I{background:#fff8e1;color:#f57f17}
+.rk-cell.S{background:#e3f2fd;color:#1565c0}
+.rk-cell.kosong{background:#f5f5f5;color:#ccc}
+.rk-td-stat{padding:7px 6px;text-align:center;font-size:12.5px;font-weight:700;border-bottom:1px solid #f0ebe0;white-space:nowrap}
+.rk-td-stat.H{color:#2e7d32}
+.rk-td-stat.A{color:#c62828}
+.rk-td-stat.I{color:#f57f17}
+.rk-td-stat.S{color:#1565c0}
+.pct-wrap{display:flex;align-items:center;gap:5px;justify-content:center;min-width:60px}
+.pct-bar{height:6px;border-radius:3px;min-width:3px;max-width:40px;transition:width .3s}
+.pct-num{font-size:11px;font-weight:700;white-space:nowrap}
+.rekap-legend{display:flex;align-items:center;gap:12px;padding:10px 18px;border-top:1px solid var(--border);flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--abu)}
+.leg-dot{width:14px;height:14px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.rekap-search{position:relative;margin-left:auto}
+.rekap-search input{border:1.5px solid #ddd;border-radius:8px;padding:7px 12px 7px 32px;font-size:12.5px;outline:none;font-family:inherit;background:#fff;width:180px}
+.rekap-search input:focus{border-color:var(--hijau-muda)}
+.rekap-search .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--abu);font-size:14px}
+
+/* LOADING SKELETON */
+.rekap-loading{padding:40px;text-align:center;color:var(--abu)}
+.rekap-loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--hijau);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:10px}
+.rekap-loading p{font-size:12.5px}
+
+/* UPLOAD */
+.up-zone{border:2px dashed var(--emas);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(201,168,76,.04)}
+.up-zone:hover{background:rgba(201,168,76,.09);border-color:var(--hijau)}
+.up-zone .ic{font-size:40px;margin-bottom:12px}
+.up-zone h3{font-size:14.5px;color:var(--hijau-tua);margin-bottom:5px}
+.up-zone p{font-size:12.5px;color:var(--abu)}
+#file-excel{display:none}
+
+/* AUTO REFRESH INDICATOR */
+.refresh-info{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--abu);font-weight:500}
+.refresh-dot{width:6px;height:6px;border-radius:50%;background:var(--hijau-terang);animation:pulse 2s infinite}
+
+/* UTIL */
+.loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--hijau-tua);color:#fff;padding:12px 17px;border-radius:10px;font-size:12.5px;font-weight:600;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:300px;border-left:4px solid var(--emas)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{border-left-color:var(--merah)}
+.toast.suc{border-left-color:#43a047}
+code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-family:monospace}
+.info-box{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:11px 15px;font-size:12.5px;color:#795548;line-height:1.5}
+.filter-bar{display:flex;gap:9px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+.filter-bar select,.filter-bar input[type=number]{border:1.5px solid #ddd;border-radius:8px;padding:7px 12px;font-size:12.5px;outline:none;font-family:inherit;background:#fff}
+
+/* =============================================
+   RESPONSIVE — MOBILE
+   ============================================= */
+@media (max-width: 768px) {
+  :root { --sw: 240px; }
+
+  /* Sidebar tersembunyi di luar layar */
+  .sb {
+    transform: translateX(-100%);
+    z-index: 200;
+  }
+  .sb.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0,0,0,.3);
+  }
+  .sb-overlay.show {
+    display: block;
+  }
+
+  /* Main full-width */
+  .main { margin-left: 0; }
+
+  /* Topbar tampilkan hamburger */
+  .ham-btn { display: flex; }
+  .tgl-top { display: none; }
+
+  /* Content padding lebih kecil */
+  .content { padding: 14px 14px; }
+  .topbar { padding: 10px 14px; }
+
+  /* Check-in: stack vertikal */
+  .ci-wrap {
+    grid-template-columns: 1fr;
+  }
+  .ci-box { padding: 22px 18px; }
+
+  /* Stat grid 2 kolom */
+  .sg { grid-template-columns: repeat(2, 1fr); }
+
+  /* Rekap toolbar wrap */
+  .rekap-toolbar { gap: 8px; }
+  .rekap-search { margin-left: 0; width: 100%; }
+  .rekap-search input { width: 100%; }
+
+  /* Sesi box stack */
+  .sesi-box { flex-direction: column; align-items: flex-start; }
+
+  /* Tabel scroll */
+  .card { overflow: visible; }
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+@media (max-width: 480px) {
+  .sg { grid-template-columns: 1fr 1fr; }
+  .ci-jam { font-size: 26px; }
+  .ci-inp { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+<!-- Overlay mobile -->
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<div class="sb" id="sidebar">
+  <div class="sb-logo">
+    <span class="ar">المفتاح للعلوم</span>
+    <div class="nm">Tarbiyah Idadiyah al-Miftah</div>
+    <div class="sb2">Powered By Nabil Ghufron</div>
+  </div>
+  <nav class="sb-nav">
+    <button class="ni on" onclick="go('dashboard',this)"><span class="ic">📊</span>Dashboard</button>
+    <button class="ni" onclick="go('checkin',this)"><span class="ic">🖥️</span>Layar Check-in</button>
+    <button class="ni" onclick="go('rekap',this)"><span class="ic">📅</span>Rekap Bulanan</button>
+    <button class="ni" onclick="go('guru',this)"><span class="ic">👤</span>Data Guru</button>
+    <button class="ni" onclick="go('upload',this)"><span class="ic">📤</span>Upload Excel</button>
+  </nav>
+  <div class="sb-ft">Madrasah Tarbiyah Idadiyah<br>al-Miftah · v4.2</div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="tb-left">
+      <button class="ham-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+      <div class="tb-title" id="page-title">Dashboard</div>
+    </div>
+    <div class="tb-right">
+      <div class="refresh-info" id="refresh-info" style="display:none">
+        <div class="refresh-dot"></div><span id="refresh-countdown">—</span>
+      </div>
+      <div class="st-badge no" id="st-badge"><div class="dot"></div><span id="st-txt">Belum terhubung</span></div>
+      <div class="tgl-top" id="tgl-top"></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="sg">
+        <div class="sc h"><div class="sc-ic">✅</div><div class="sc-lb">Hadir Hari Ini</div><div class="sc-val" id="s-hadir">—</div><div class="sc-desc">Sudah check-in</div></div>
+        <!-- FIX: Alpha sekarang = total guru - yang hadir -->
+        <div class="sc a"><div class="sc-ic">❌</div><div class="sc-lb">Belum Hadir</div><div class="sc-val" id="s-alpha">—</div><div class="sc-desc">Belum check-in</div></div>
+        <div class="sc t"><div class="sc-ic">👥</div><div class="sc-lb">Total Guru</div><div class="sc-val" id="s-total">—</div><div class="sc-desc">Terdaftar</div></div>
+        <div class="sc p"><div class="sc-ic">📈</div><div class="sc-lb">% Hadir Bulan Ini</div><div class="sc-val" id="s-persen">—</div><div class="sc-desc">Rata-rata</div></div>
+      </div>
+      <div class="card">
+        <div class="ch">
+          <div><div class="ct">📋 Absensi Terkini</div><div class="cs">10 input terakhir</div></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="refresh-info" id="dash-refresh-info" style="display:none;font-size:11px;color:var(--abu)">
+              <span class="refresh-dot"></span> auto-refresh <span id="dash-countdown">—</span>s
+            </span>
+            <button class="btn btn-g" onclick="loadDashboard()">🔄 Refresh</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nama Guru</th><th>Dom</th><th>Tingkatan</th><th>Tanggal</th><th>Status</th><th>Keterangan</th></tr></thead>
+            <tbody id="tb-terkini"><tr><td colspan="6"><div class="empty"><div class="ic">📭</div><p>Belum ada data</p></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECK-IN -->
+    <div class="page" id="page-checkin">
+      <div class="sesi-box" id="sesi-box">
+        <div class="sesi-info">
+          <div class="sesi-label">Sesi Absensi Hari Ini</div>
+          <div class="sesi-tgl" id="sesi-tgl-hijri">Belum ada sesi aktif</div>
+          <div class="sesi-tgl-m" id="sesi-tgl-masehi">—</div>
+        </div>
+        <div class="sesi-actions" id="sesi-actions"></div>
+      </div>
+      <div class="ci-wrap">
+        <div class="ci-box">
+          <span class="ci-ar">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</span>
+          <div class="ci-sub">Absensi Guru · Idadiyah al-Miftah</div>
+          <div class="ci-jam" id="ci-jam">00:00:00</div>
+          <div class="ci-tgl" id="ci-tgl"></div>
+          <span class="ci-lbl">Ketik ID PPS lalu tekan Enter</span>
+          <input type="text" class="ci-inp" id="ci-inp" placeholder="Ketik ID PPS di sini..."
+            autocomplete="off" onkeydown="if(event.key==='Enter')doCheckin()">
+          <div class="ci-hint">Contoh: 14390784 → Enter → langsung tercatat Hadir</div>
+          <div class="ci-fb" id="ci-fb">
+            <div class="fb-nm" id="fb-nm"></div>
+            <div class="fb-dt" id="fb-dt"></div>
+            <div class="fb-bd" id="fb-bd"></div>
+          </div>
+        </div>
+        <div class="ci-side">
+          <div class="ss"><div class="ss-ic g">✅</div><div><div class="ss-val" id="ci-hadir">0</div><div class="ss-lb">Hadir Hari Ini</div></div></div>
+          <!-- FIX: Label & kalkulasi Alpha diperbaiki -->
+          <div class="ss"><div class="ss-ic r">❌</div><div><div class="ss-val" id="ci-alpha">0</div><div class="ss-lb">Belum Check-in</div></div></div>
+          <div class="ss"><div class="ss-ic e">👥</div><div><div class="ss-val" id="ci-total">0</div><div class="ss-lb">Total Guru</div></div></div>
+          <div class="log-card">
+            <div class="log-hd">🕐 Check-in Terakhir</div>
+            <div class="log-list" id="log-list"><div class="log-empty">Belum ada check-in</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REKAP BULANAN -->
+    <div class="page" id="page-rekap">
+      <div class="card" style="overflow:visible">
+        <!-- Toolbar filter -->
+        <div class="rekap-toolbar">
+          <select id="f-bulan-hijri">
+            <option value="1">Muharram</option><option value="2">Shafar</option>
+            <option value="3">Rabiul Awwal</option><option value="4">Rabiul Akhir</option>
+            <option value="5">Jumadal Ula</option><option value="6">Jumadal Akhirah</option>
+            <option value="7">Rajab</option><option value="8">Syaban</option>
+            <option value="9">Ramadhan</option><option value="10">Syawwal</option>
+            <option value="11">Dzulqadah</option><option value="12">Dzulhijjah</option>
+          </select>
+          <input type="number" id="f-tahun-hijri" value="1446" min="1440" max="1460" style="width:85px">
+          <button class="btn btn-g" onclick="loadRekap()">🔍 Tampilkan</button>
+          <button class="btn btn-e" onclick="exportRekapExcel()" id="btn-export-rekap" style="display:none">⬇️ Export Excel</button>
+          <div class="rekap-search">
+            <span class="si">🔍</span>
+            <input type="text" id="rekap-cari" placeholder="Cari nama guru..." oninput="filterRekap()">
+          </div>
+        </div>
+
+        <!-- Judul bulan -->
+        <div class="rekap-judul" id="rekap-judul" style="display:none"></div>
+        <div class="rekap-sub" id="rekap-sub"></div>
+
+        <!-- Tabel kalender -->
+        <div class="rekap-scroll" id="rekap-wrap">
+          <table class="tbl-rekap" id="tbl-rekap">
+            <thead id="thead-rekap"></thead>
+            <tbody id="tbody-rekap">
+              <tr><td colspan="9"><div class="empty"><div class="ic">📅</div><p>Pilih bulan Hijriah lalu klik Tampilkan</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Legenda -->
+        <div class="rekap-legend">
+          <div class="leg-item"><div class="leg-dot rk-cell H" style="width:20px;height:16px">H</div> Hadir</div>
+          <div class="leg-item"><div class="leg-dot rk-cell A" style="width:20px;height:16px">A</div> Alpha</div>
+          <div class="leg-item"><div class="leg-dot rk-cell I" style="width:20px;height:16px">I</div> Izin</div>
+          <div class="leg-item"><div class="leg-dot rk-cell S" style="width:20px;height:16px">S</div> Sakit</div>
+          <div class="leg-item"><div class="leg-dot rk-cell kosong" style="width:20px;height:16px">·</div> Tidak ada sesi</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA GURU -->
+    <div class="page" id="page-guru">
+      <div class="card">
+        <div class="ch">
+          <div><div class="ct">👤 Data Guru</div><div class="cs" id="jml-guru">—</div></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>ID PPS</th><th>Nama Guru</th><th>Dom</th><th>Tingkatan</th></tr></thead>
+            <tbody id="tb-guru"><tr><td colspan="5"><div class="empty"><div class="ic">👥</div><p>Belum ada data guru</p></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="page" id="page-upload">
+      <div class="card">
+        <div class="ch"><div><div class="ct">📤 Upload Data Guru via Excel</div><div class="cs">Kolom: idpps · nama · dom · tingkatan</div></div></div>
+        <div style="padding:22px">
+          <div class="info-box" style="margin-bottom:16px">ℹ️ Baris pertama = header: <strong>idpps</strong>, <strong>nama</strong>, <strong>dom</strong>, <strong>tingkatan</strong>. Data lama dengan ID yang sama akan diperbarui (upsert).</div>
+          <div class="up-zone" onclick="document.getElementById('file-excel').click()">
+            <div class="ic">📂</div>
+            <h3>Klik atau seret file Excel ke sini</h3>
+            <p>Format: .xlsx · .xls</p>
+            <button class="btn btn-e" style="margin-top:12px" onclick="event.stopPropagation();document.getElementById('file-excel').click()">Pilih File</button>
+          </div>
+          <input type="file" id="file-excel" accept=".xlsx,.xls" onchange="previewExcel(this)">
+          <div id="prev-wrap" style="display:none;margin-top:22px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div class="ct">👁️ Preview: <span id="prev-count">0</span> guru</div>
+              <button class="btn btn-g" onclick="importGuru()" id="btn-import">⬆️ Import ke Supabase</button>
+            </div>
+            <div class="table-wrap">
+              <table><thead><tr><th>#</th><th>ID PPS</th><th>Nama</th><th>Dom</th><th>Tingkatan</th></tr></thead><tbody id="prev-body"></tbody></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== SUPABASE CONFIG =====
+// ⚠️ PENTING: Aktifkan Row Level Security (RLS) di semua tabel Supabase Anda!
+// Tabel yang perlu RLS: guru, absensi, kalender_hijriah, sesi_absensi
+// Key anon ini aman selama RLS dikonfigurasi dengan benar.
+//
+// SQL untuk membuat tabel sesi_absensi (jalankan sekali di Supabase SQL Editor):
+// ----------------------------------------------------------------------------
+// create table if not exists sesi_absensi (
+//   id            bigserial primary key,
+//   tanggal_key   text unique not null,
+//   hijri_label   text,
+//   hijri_day     int,
+//   hijri_month   int,
+//   hijri_year    int,
+//   is_aktif      boolean default true,
+//   dibuka_pada   text,
+//   created_at    timestamptz default now()
+// );
+// ----------------------------------------------------------------------------
+const SB_URL = 'https://ttftmzfncjtfyrphanlw.supabase.co';
+const SB_KEY = 'sb_publishable_DTSgzhCZp4dQXKUgANcqiQ_6dL-NxYR';
+
+// ===== KONSTANTA =====
+const BLN_H = ['','Muharram','Shafar','Rabiul Awwal','Rabiul Akhir','Jumadal Ula','Jumadal Akhirah','Rajab','Syaban','Ramadhan','Syawwal','Dzulqadah','Dzulhijjah'];
+const BLN_M = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const HARI  = ['Ahad','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+
+// ===== STATE =====
+let sb = null, daftarGuru = [], prevData = [], logHariIni = [];
+let sesiAktif = null;
+let rekapData = [];
+let rekapHariArr = [];
+
+// ===== AUTO-REFRESH STATE =====
+const REFRESH_INTERVAL = 30; // detik
+let dashRefreshTimer = null;
+let dashCountdown = REFRESH_INTERVAL;
+let checkinRefreshTimer = null;
+let sesiPollTimer = null;       // polling sesi dari Supabase
+let activePage = 'dashboard';
+
+// ===== MOBILE SIDEBAR =====
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const overlay = document.getElementById('sb-overlay');
+  sb.classList.toggle('open');
+  overlay.classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+
+// ===== HIJRIAH UTILS =====
+function gregorianToHijri(year, month, day) {
+  try {
+    const d = new Date(year, month-1, day);
+    const hParts = new Intl.DateTimeFormat('id-u-ca-islamic-umalqura', {
+      day:'numeric', month:'numeric', year:'numeric'
+    }).formatToParts(d);
+    let hd=1,hm=1,hy=1446;
+    hParts.forEach(p=>{
+      if(p.type==='day') hd=parseInt(p.value);
+      if(p.type==='month') hm=parseInt(p.value);
+      if(p.type==='year') hy=parseInt(p.value);
+    });
+    return {day:hd, month:hm, year:hy};
+  } catch(e) {
+    return {day:1, month:1, year:1446};
+  }
+}
+
+function todayHijri() {
+  const now = new Date();
+  return gregorianToHijri(now.getFullYear(), now.getMonth()+1, now.getDate());
+}
+
+function hijriLabel(hd, hm, hy) { return `${hd} ${BLN_H[hm]} ${hy}`; }
+function todayMasehi() {
+  const now = new Date();
+  return `${HARI[now.getDay()]}, ${now.getDate()} ${BLN_M[now.getMonth()]} ${now.getFullYear()}`;
+}
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmtTgl(d){ return `${HARI[d.getDay()]}, ${d.getDate()} ${BLN_M[d.getMonth()]} ${d.getFullYear()}`; }
+function fmtJam(d){ return d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function fmtWkt(d){ return d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}); }
+
+function namaHariFromMasehi(tglStr) {
+  const d = new Date(tglStr + 'T00:00:00');
+  return HARI[d.getDay()];
+}
+
+// ===== SESI ABSENSI — SUPABASE-BACKED =====
+// Sesi disimpan di tabel `sesi_absensi` agar sinkron antar perangkat.
+// Schema tabel:
+//   id            serial primary key
+//   tanggal_key   text unique not null   -- format H-YYYY-MM-DD
+//   hijri_label   text
+//   hijri_day     int
+//   hijri_month   int
+//   hijri_year    int
+//   is_aktif      boolean default true
+//   dibuka_pada   text                   -- tanggal masehi, hanya catatan
+//   created_at    timestamptz default now()
+
+async function loadSesi() {
+  if (!sb) {
+    // Fallback ke localStorage jika Supabase belum siap
+    try { sesiAktif = JSON.parse(localStorage.getItem('sesi_absensi')||'null'); } catch(e){ sesiAktif=null; }
+    renderSesi(); return;
+  }
+  try {
+    const { data, error } = await sb
+      .from('sesi_absensi')
+      .select('*')
+      .eq('is_aktif', true)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    sesiAktif = data || null;
+    // Sync ke localStorage sebagai cache offline
+    if (sesiAktif) localStorage.setItem('sesi_absensi', JSON.stringify(sesiAktif));
+    else localStorage.removeItem('sesi_absensi');
+  } catch(e) {
+    console.warn('loadSesi error, fallback ke localStorage:', e.message);
+    try { sesiAktif = JSON.parse(localStorage.getItem('sesi_absensi')||'null'); } catch(_){ sesiAktif=null; }
+  }
+  renderSesi();
+}
+
+// Poll sesi dari Supabase tiap 15 detik (supaya perangkat lain ikut ter-update)
+function startSesiPoll() {
+  if (sesiPollTimer) clearInterval(sesiPollTimer);
+  sesiPollTimer = setInterval(async () => {
+    if (!sb || activePage !== 'checkin') return;
+    const sebelumnya = sesiAktif ? sesiAktif.tanggal_key : null;
+    await loadSesi();
+    const sekarang = sesiAktif ? sesiAktif.tanggal_key : null;
+    if (sebelumnya !== sekarang) {
+      // Sesi berubah dari perangkat lain
+      updateSideStats();
+      if (sekarang) toast('🔄 Sesi diperbarui: ' + sesiAktif.hijri_label, '');
+      else toast('🔒 Sesi telah ditutup dari perangkat lain.', '');
+    }
+  }, 15000);
+}
+
+function renderSesi() {
+  const box = document.getElementById('sesi-box');
+  const tglH = document.getElementById('sesi-tgl-hijri');
+  const tglM = document.getElementById('sesi-tgl-masehi');
+  const acts = document.getElementById('sesi-actions');
+
+  if (sesiAktif) {
+    box.className = 'sesi-box aktif';
+    tglH.textContent = sesiAktif.hijri_label;
+    tglM.textContent = 'Tanggal sesi: ' + (sesiAktif.tanggal_key || '—');
+    acts.innerHTML = `
+      <div class="sesi-status buka">🟢 Sesi Aktif</div>
+      <button class="btn-sesi btn-tutup-sesi" onclick="tutupSesi()">🔒 Tutup Sesi</button>
+    `;
+    document.getElementById('tgl-top').textContent = sesiAktif.hijri_label;
+    document.getElementById('ci-tgl').textContent = sesiAktif.hijri_label + ' · ' + (sesiAktif.tanggal_key || '');
+  } else {
+    box.className = 'sesi-box';
+    tglH.textContent = 'Belum ada sesi aktif';
+    tglM.textContent = 'Tentukan tanggal Hijriah lalu buka sesi';
+    acts.innerHTML = buildBukaSesiForm();
+    const hh = todayHijri();
+    setTimeout(()=>{
+      const ed=document.getElementById('inp-hd'), em=document.getElementById('inp-hm'), ey=document.getElementById('inp-hy');
+      if(ed) ed.value=hh.day;
+      if(em) em.value=hh.month;
+      if(ey) ey.value=hh.year;
+    }, 50);
+  }
+}
+
+function buildBukaSesiForm() {
+  const hh = todayHijri();
+  const blnOpts = BLN_H.slice(1).map((b,i)=>`<option value="${i+1}"${i+1===hh.month?' selected':''}>${b}</option>`).join('');
+  return `
+    <input type="number" class="input-hijri" id="inp-hd" value="${hh.day}" min="1" max="30" placeholder="Tgl">
+    <select class="select-hijri" id="inp-hm">${blnOpts}</select>
+    <input type="number" class="input-hijri" id="inp-hy" value="${hh.year}" min="1440" max="1460" style="width:65px" placeholder="Tahun">
+    <button class="btn-sesi btn-buka" onclick="bukaSesi()">🟢 Buka Sesi</button>
+  `;
+}
+
+async function bukaSesi() {
+  if(!sb){ toast('Supabase belum terhubung!','err'); return; }
+  const hd = parseInt(document.getElementById('inp-hd').value)||1;
+  const hm = parseInt(document.getElementById('inp-hm').value)||1;
+  const hy = parseInt(document.getElementById('inp-hy').value)||1446;
+  if(hd<1||hd>30||hm<1||hm>12||hy<1400){ toast('Tanggal Hijriah tidak valid!','err'); return; }
+
+  const tglKey = `H-${hy}-${String(hm).padStart(2,'0')}-${String(hd).padStart(2,'0')}`;
+  const label = hijriLabel(hd, hm, hy);
+
+  // Tutup semua sesi aktif dulu (hanya boleh 1 sesi aktif)
+  await sb.from('sesi_absensi').update({ is_aktif: false }).eq('is_aktif', true);
+
+  // Buka sesi baru di Supabase
+  const { data: sesiBaru, error: sesiErr } = await sb.from('sesi_absensi').upsert({
+    tanggal_key: tglKey,
+    hijri_label: label,
+    hijri_day: hd, hijri_month: hm, hijri_year: hy,
+    is_aktif: true,
+    dibuka_pada: today()
+  }, { onConflict: 'tanggal_key' }).select().single();
+
+  if (sesiErr) { toast('❌ Gagal buka sesi: ' + sesiErr.message, 'err'); return; }
+
+  sesiAktif = sesiBaru;
+  localStorage.setItem('sesi_absensi', JSON.stringify(sesiAktif));
+
+  // Simpan juga ke kalender_hijriah untuk keperluan rekap
+  const { error: kalErr } = await sb.from('kalender_hijriah').upsert({
+    tanggal_sesi: tglKey,
+    hijri_day: hd, hijri_month: hm, hijri_year: hy,
+    hijri_label: label
+  }, { onConflict: 'tanggal_sesi' });
+  if (kalErr) console.warn('Kalender hijriah save error:', kalErr.message);
+
+  renderSesi();
+  updateSideStats();
+  toast('✅ Sesi absensi ' + label + ' dibuka!', 'suc');
+}
+
+async function tutupSesi() {
+  if(!sesiAktif) return;
+  if(!confirm('Tutup sesi absensi ' + sesiAktif.hijri_label + '?\n\nGuru yang belum check-in akan otomatis dicatat Alpha.')) return;
+
+  if(sb && daftarGuru.length > 0){
+    const tgl = sesiAktif.tanggal_key;
+    const {data:sudahAbsen} = await sb.from('absensi').select('id_pps').eq('tanggal', tgl);
+    const sudahIds = new Set((sudahAbsen||[]).map(a=>a.id_pps));
+    const alphaList = daftarGuru
+      .filter(g => !sudahIds.has(g.id_pps))
+      .map(g => ({
+        id_pps: g.id_pps, tanggal: tgl, status: 'A',
+        hijri_label: sesiAktif.hijri_label,
+        keterangan: 'Auto-alpha saat sesi ditutup · ' + sesiAktif.hijri_label
+      }));
+    if(alphaList.length > 0){
+      const {error} = await sb.from('absensi').insert(alphaList);
+      if(error) toast('⚠️ Gagal insert alpha: ' + error.message, 'err');
+      else toast(`🔒 Sesi ditutup. ${alphaList.length} guru dicatat Alpha.`, '');
+    } else {
+      toast('🔒 Sesi ditutup. Semua guru sudah check-in.', 'suc');
+    }
+  } else {
+    toast('🔒 Sesi ditutup.', '');
+  }
+
+  // Nonaktifkan sesi di Supabase
+  if(sb && sesiAktif?.id){
+    await sb.from('sesi_absensi').update({ is_aktif: false }).eq('id', sesiAktif.id);
+  }
+
+  sesiAktif = null;
+  localStorage.removeItem('sesi_absensi');
+  renderSesi();
+}
+
+function getTanggalSesi() {
+  return sesiAktif ? sesiAktif.tanggal_key : null;
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', ()=>{
+  const now = new Date();
+  document.getElementById('tgl-top').textContent = fmtTgl(now);
+  document.getElementById('ci-tgl').textContent = fmtTgl(now);
+
+  const hh = todayHijri();
+  document.getElementById('f-bulan-hijri').value = hh.month;
+  document.getElementById('f-tahun-hijri').value = hh.year;
+
+  setInterval(()=>{ document.getElementById('ci-jam').textContent = fmtJam(new Date()); }, 1000);
+  connect(true);
+});
+
+// ===== NAVIGASI =====
+function go(nama, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  document.getElementById('page-'+nama).classList.add('active');
+  if(btn) btn.classList.add('on');
+  const tt = {dashboard:'Dashboard',checkin:'Layar Check-in Guru',rekap:'Rekap Bulanan',guru:'Data Guru',upload:'Upload Data Guru'};
+  document.getElementById('page-title').textContent = tt[nama];
+  activePage = nama;
+
+  // Tutup sidebar di mobile setelah navigasi
+  closeSidebar();
+
+  // Kelola timer auto-refresh
+  stopAutoRefresh();
+  if(nama==='dashboard') startDashboardRefresh();
+  if(nama==='checkin'){
+    document.getElementById('ci-inp').focus();
+    updateSideStats();
+    startCheckinRefresh();
+    startSesiPoll();   // polling sesi dari Supabase
+  } else {
+    if(sesiPollTimer){ clearInterval(sesiPollTimer); sesiPollTimer=null; }
+  }
+  if(nama==='guru') renderGuru();
+  if(nama==='dashboard') loadDashboard();
+}
+
+// ===== AUTO-REFRESH =====
+function startDashboardRefresh() {
+  const infoEl = document.getElementById('dash-refresh-info');
+  const cdEl   = document.getElementById('dash-countdown');
+  if(infoEl) infoEl.style.display = 'inline-flex';
+  dashCountdown = REFRESH_INTERVAL;
+  if(cdEl) cdEl.textContent = dashCountdown;
+
+  dashRefreshTimer = setInterval(()=>{
+    dashCountdown--;
+    if(cdEl) cdEl.textContent = dashCountdown;
+    if(dashCountdown <= 0){
+      dashCountdown = REFRESH_INTERVAL;
+      loadDashboard();
+    }
+  }, 1000);
+}
+
+function startCheckinRefresh() {
+  checkinRefreshTimer = setInterval(()=>{
+    if(activePage === 'checkin') updateSideStats();
+  }, REFRESH_INTERVAL * 1000);
+}
+
+function stopAutoRefresh() {
+  if(dashRefreshTimer){ clearInterval(dashRefreshTimer); dashRefreshTimer = null; }
+  if(checkinRefreshTimer){ clearInterval(checkinRefreshTimer); checkinRefreshTimer = null; }
+  const infoEl = document.getElementById('dash-refresh-info');
+  if(infoEl) infoEl.style.display = 'none';
+}
+
+// ===== SUPABASE =====
+async function connect(silent=false){
+  try {
+    const {createClient}=supabase;
+    sb=createClient(SB_URL, SB_KEY);
+    const {data, error}=await sb.from('guru').select('id_pps').limit(1);
+    if(error) throw error;
+    document.getElementById('st-badge').className='st-badge ok';
+    document.getElementById('st-txt').textContent='Terhubung';
+    if(!silent) toast('✅ Berhasil terhubung!','suc');
+    await loadGuru();
+    await loadSesi();
+    loadDashboard();
+    updateSideStats();
+    startDashboardRefresh();
+  } catch(e){
+    sb=null;
+    document.getElementById('st-badge').className='st-badge no';
+    document.getElementById('st-txt').textContent='Gagal: '+e.message;
+    if(!silent) toast('❌ '+e.message,'err');
+    console.error('Supabase connect error:', e);
+  }
+}
+
+async function loadGuru(){
+  if(!sb) return;
+  const {data,error}=await sb.from('guru').select('*').order('nama');
+  if(error){ console.error('loadGuru error:',error.message); return; }
+  daftarGuru = data||[];
+  const el1=document.getElementById('ci-total');
+  const el2=document.getElementById('s-total');
+  if(el1) el1.textContent = daftarGuru.length;
+  if(el2) el2.textContent = daftarGuru.length;
+}
+
+// ===== CHECK-IN =====
+async function doCheckin(){
+  const inp=document.getElementById('ci-inp');
+  const idpps=inp.value.trim(); if(!idpps) return;
+  if(!sb){ showFb('err','Koneksi Error','Supabase belum terhubung','notfound'); inp.value=''; return; }
+  if(!sesiAktif){ showFb('err','⚠️ Sesi Belum Dibuka','Buka sesi absensi dulu di atas!','notfound'); inp.value=''; setTimeout(clearFb,3500); return; }
+
+  const guru=daftarGuru.find(g=>String(g.id_pps)===idpps);
+  if(!guru){
+    showFb('err','❌ ID Tidak Dikenali','ID "'+idpps+'" tidak ditemukan','notfound');
+    inp.value=''; setTimeout(clearFb,3500); return;
+  }
+
+  const tgl = getTanggalSesi();
+  if(!tgl){ showFb('err','⚠️ Sesi Belum Dibuka','Buka sesi absensi dulu!','notfound'); inp.value=''; setTimeout(clearFb,3500); return; }
+  const {data:exist}=await sb.from('absensi').select('id,status').eq('id_pps',idpps).eq('tanggal',tgl).maybeSingle();
+  if(exist){
+    const lbl={H:'Hadir',A:'Alpha',I:'Izin',S:'Sakit'};
+    showFb('err',guru.nama,guru.dom+' · '+guru.tingkatan,'sudah');
+    document.getElementById('fb-dt').textContent = `Status ${sesiAktif.hijri_label}: ${lbl[exist.status]||exist.status}`;
+    inp.value=''; setTimeout(clearFb,3500); return;
+  }
+
+  const ket = 'Check-in mandiri · ' + sesiAktif.hijri_label;
+  const {error}=await sb.from('absensi').insert({
+    id_pps:idpps, tanggal:tgl, status:'H', keterangan:ket,
+    hijri_label: sesiAktif.hijri_label
+  });
+  if(error){ showFb('err','❌ Gagal',error.message,'notfound'); }
+  else {
+    showFb('ok',guru.nama,guru.dom+' · '+guru.tingkatan,'hadir');
+    logHariIni.unshift({nama:guru.nama,dom:guru.dom,waktu:new Date()});
+    renderLog(); updateSideStats();
+  }
+  inp.value=''; setTimeout(()=>{ clearFb(); document.getElementById('ci-inp').focus(); },3500);
+}
+
+function showFb(type,nama,detail,badge){
+  document.getElementById('fb-nm').textContent=nama;
+  document.getElementById('fb-dt').textContent=detail;
+  const bd=document.getElementById('fb-bd');
+  const labels={hadir:'✅ Hadir tercatat!',sudah:'⚠️ Sudah check-in hari ini',notfound:'❌ Tidak ditemukan'};
+  bd.textContent=labels[badge]||''; bd.className='fb-bd '+badge;
+  document.getElementById('ci-fb').className='ci-fb '+(type==='ok'?'ok':'err');
+}
+
+function clearFb(){ document.getElementById('ci-fb').className='ci-fb'; }
+
+function renderLog(){
+  const el=document.getElementById('log-list');
+  if(!logHariIni.length){ el.innerHTML='<div class="log-empty">Belum ada check-in</div>'; return; }
+  el.innerHTML=logHariIni.slice(0,12).map(l=>`
+    <div class="log-item">
+      <div class="log-av">${l.nama.charAt(0)}</div>
+      <div><div class="log-nm">${l.nama}</div><div class="log-sb">${l.dom} · ${fmtWkt(l.waktu)}</div></div>
+    </div>`).join('');
+}
+
+// FIX: Alpha = total guru - yang hadir (bukan yang ber-status 'A' di DB)
+async function updateSideStats(){
+  if(!sb) return;
+  const tgl=getTanggalSesi();
+  if(!tgl){
+    document.getElementById('ci-hadir').textContent='—';
+    document.getElementById('ci-alpha').textContent='—';
+    return;
+  }
+  const {data:dH}=await sb.from('absensi').select('id').eq('tanggal',tgl).eq('status','H');
+  const hadir=(dH||[]).length;
+  const belum = Math.max(0, daftarGuru.length - hadir);
+  document.getElementById('ci-hadir').textContent=hadir;
+  document.getElementById('ci-alpha').textContent=belum;
+}
+
+// ===== DASHBOARD =====
+async function loadDashboard(){
+  if(!sb) return;
+  const tgl = getTanggalSesi(); // null jika tidak ada sesi
+  let hadirHariIni = 0;
+  if(tgl){
+    const {data:dH}=await sb.from('absensi').select('status').eq('tanggal',tgl);
+    hadirHariIni = (dH||[]).filter(a=>a.status==='H').length;
+  }
+  document.getElementById('s-hadir').textContent = tgl ? hadirHariIni : '—';
+
+  // Alpha = total guru - yang hadir di sesi aktif
+  const alphaHariIni = tgl ? Math.max(0, daftarGuru.length - hadirHariIni) : '—';
+  document.getElementById('s-alpha').textContent = alphaHariIni;
+
+  // % Hadir Bulan Ini — ambil dari sesi Hijriah bulan ini via kalender_hijriah
+  const hh = todayHijri();
+  const { data: sesibulan } = await sb
+    .from('kalender_hijriah')
+    .select('tanggal_sesi')
+    .eq('hijri_month', hh.month)
+    .eq('hijri_year', hh.year);
+  const tglBulanIni = (sesibulan||[]).map(s=>s.tanggal_sesi);
+  let hadirB = 0, tot = 0;
+  if(tglBulanIni.length > 0){
+    const { data: dB } = await sb.from('absensi').select('status').in('tanggal', tglBulanIni);
+    tot = (dB||[]).length;
+    hadirB = (dB||[]).filter(a=>a.status==='H').length;
+  }
+  document.getElementById('s-persen').textContent=tot>0?Math.round(hadirB/tot*100)+'%':'—';
+
+  const {data:tk}=await sb.from('absensi').select('*,guru(nama,dom,tingkatan)').order('created_at',{ascending:false}).limit(10);
+  const lbl={H:'Hadir',A:'Alpha',I:'Izin',S:'Sakit'};
+  const tb=document.getElementById('tb-terkini');
+  if(!tk||!tk.length){ tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="ic">📭</div><p>Belum ada absensi</p></div></td></tr>'; return; }
+  tb.innerHTML=tk.map(a=>`<tr>
+    <td style="font-weight:600">${a.guru?.nama||a.id_pps}</td>
+    <td>${a.guru?.dom||'—'}</td><td>${a.guru?.tingkatan||'—'}</td>
+    <td>${a.hijri_label||a.tanggal}</td>
+    <td><span class="badge ${a.status}">${lbl[a.status]||a.status}</span></td>
+    <td style="color:var(--abu);font-size:12.5px">${a.keterangan||'—'}</td>
+  </tr>`).join('');
+}
+
+// ===== REKAP BULANAN — BERBASIS SESI HIJRIAH =====
+async function loadRekap(){
+  if(!sb){ toast('Hubungkan Supabase!','err'); return; }
+  const hBulan = parseInt(document.getElementById('f-bulan-hijri').value);
+  const hTahun = parseInt(document.getElementById('f-tahun-hijri').value);
+  const bulanLabel = BLN_H[hBulan] + ' ' + hTahun + ' H';
+
+  const thead = document.getElementById('thead-rekap');
+  const tbody = document.getElementById('tbody-rekap');
+  const judul = document.getElementById('rekap-judul');
+  const sub   = document.getElementById('rekap-sub');
+  const btnExp = document.getElementById('btn-export-rekap');
+
+  judul.style.display='none';
+  btnExp.style.display='none';
+  rekapData=[]; rekapHariArr=[];
+
+  thead.innerHTML='';
+  tbody.innerHTML=`<tr><td colspan="9">
+    <div class="rekap-loading">
+      <div class="spin"></div>
+      <p>Memuat rekap ${bulanLabel}...</p>
+    </div>
+  </td></tr>`;
+  sub.textContent = '';
+
+  // 1. Ambil semua sesi (kalender_hijriah) untuk bulan & tahun Hijriah ini
+  //    tanggal_sesi di sini sebenarnya adalah tglKey format H-YYYY-MM-DD
+  const {data:sesiList, error:sesiErr} = await sb
+    .from('kalender_hijriah')
+    .select('tanggal_sesi,hijri_day,hijri_label,hijri_month,hijri_year')
+    .eq('hijri_month', hBulan)
+    .eq('hijri_year', hTahun)
+    .order('hijri_day', {ascending: true});
+  if(sesiErr){ toast('Gagal ambil kalender: '+sesiErr.message,'err'); tbody.innerHTML=''; return; }
+
+  // 2. Bangun 30 kolom hari untuk sebulan penuh (1–30)
+  //    Kolom yang ada sesinya = ada data di sesiList, kosong = belum ada sesi
+  const kalData = [];
+  for(let i=1; i<=30; i++){
+    const s = (sesiList||[]).find(x=>x.hijri_day===i);
+    kalData.push({
+      hijri_day: i,
+      hijri_label: `${i} ${BLN_H[hBulan]} ${hTahun}`,
+      tanggal_key: s ? s.tanggal_sesi : null, // null = belum ada sesi
+      ada_sesi: !!s
+    });
+  }
+
+  // 3. Ambil absensi untuk semua tglKey yang ada sesinya
+  const tglArr = kalData.map(k=>k.tanggal_key).filter(Boolean);
+  let absenData = [];
+  if(tglArr.length > 0) {
+    const absenRes = await sb
+      .from('absensi')
+      .select('id_pps,status,tanggal,guru(nama,dom,tingkatan)')
+      .in('tanggal', tglArr)
+      .order('tanggal');
+    if(absenRes.error){ toast('Gagal ambil absensi: '+absenRes.error.message,'err'); tbody.innerHTML=''; return; }
+    absenData = absenRes.data || [];
+  }
+
+  // 4. Bangun map guru
+  const map={};
+  daftarGuru.forEach(g=>{
+    map[g.id_pps]={nama:g.nama, dom:g.dom||'—', tingkatan:g.tingkatan||'—', idpps:g.id_pps, tgl:{}};
+  });
+  (absenData||[]).forEach(a=>{
+    if(!map[a.id_pps]) map[a.id_pps]={
+      nama:a.guru?.nama||a.id_pps, dom:a.guru?.dom||'—',
+      tingkatan:a.guru?.tingkatan||'—', idpps:a.id_pps, tgl:{}
+    };
+    map[a.id_pps].tgl[a.tanggal]=a.status;
+  });
+
+  // 5. Untuk kolom yang ADA sesi: jika guru tidak absen → Alpha
+  //    Untuk kolom yang TIDAK ada sesi: biarkan kosong (undefined)
+  kalData.forEach(k=>{
+    if(k.ada_sesi && k.tanggal_key){
+      Object.values(map).forEach(r=>{
+        if(!r.tgl[k.tanggal_key]) r.tgl[k.tanggal_key]='A';
+      });
+    }
+  });
+
+  rekapHariArr = kalData;
+  rekapData = Object.entries(map).sort((a,b)=>a[1].nama.localeCompare(b[1].nama));
+
+  // 6. Render header tabel
+  const thHariNum = kalData.map(k=>`<th class="rk-th-hari" title="${k.hijri_label}"${!k.ada_sesi?' style="opacity:.35"':''}>${k.hijri_day}</th>`).join('');
+  const thNamaHari = kalData.map(k=>`<th class="rk-th-namahari"${!k.ada_sesi?' style="opacity:.35"':''}>${k.ada_sesi?'✓':'·'}</th>`).join('');
+  const colKiri = `
+    <th class="rk-th-kiri center" rowspan="2">#</th>
+    <th class="rk-th-kiri" rowspan="2">ID PPS</th>
+    <th class="rk-th-kiri" rowspan="2" style="min-width:160px">Nama Guru</th>
+    <th class="rk-th-kiri" rowspan="2">Dom</th>
+    <th class="rk-th-kiri" rowspan="2">Tingkat</th>`;
+  const colStat = `
+    <th class="rk-th-stat" rowspan="2" style="color:#2e7d32">H</th>
+    <th class="rk-th-stat" rowspan="2" style="color:#c62828">A</th>
+    <th class="rk-th-stat" rowspan="2" style="color:#f57f17">I</th>
+    <th class="rk-th-stat" rowspan="2" style="color:#1565c0">S</th>
+    <th class="rk-th-stat" rowspan="2">%</th>`;
+  thead.innerHTML = `
+    <tr>${colKiri}${thHariNum}${colStat}</tr>
+    <tr>${thNamaHari}</tr>`;
+
+  const jmlSesi = kalData.filter(k=>k.ada_sesi).length;
+  renderRekapRows();
+  judul.textContent = bulanLabel + ' (Hijriah)';
+  judul.style.display='block';
+  sub.textContent = jmlSesi + ' sesi · ' + rekapData.length + ' guru';
+  if(jmlSesi===0) sub.textContent += ' · Belum ada sesi di bulan ini';
+  btnExp.style.display='inline-flex';
+}
+
+function renderRekapRows(filter=''){
+  const tbody = document.getElementById('tbody-rekap');
+  let rows = rekapData;
+  if(filter){
+    const q=filter.toLowerCase();
+    rows=rows.filter(([,r])=>r.nama.toLowerCase().includes(q)||String(r.idpps).includes(q));
+  }
+  if(!rows.length){
+    tbody.innerHTML='<tr><td colspan="'+(5+rekapHariArr.length+5)+'"><div class="empty"><div class="ic">🔍</div><p>Tidak ada guru yang sesuai pencarian</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(([idpps,r],i)=>{
+    const kalCells = rekapHariArr.map(k=>{
+      if(!k.ada_sesi){
+        // Belum ada sesi — tampilkan sel abu-abu tidak bisa diklik
+        return `<td style="text-align:center;padding:6px 4px"><span class="rk-cell kosong" title="${k.hijri_label}: tidak ada sesi" style="cursor:default">·</span></td>`;
+      }
+      const st = r.tgl[k.tanggal_key];
+      const ic={H:'✓',A:'✗',I:'I',S:'S'}[st]||'·';
+      return `<td style="text-align:center;padding:6px 4px">
+        <span class="rk-cell ${st||'kosong'}" title="${k.hijri_label}: ${st||'—'}" style="cursor:pointer" onclick="editRekapStatus('${r.idpps}','${k.tanggal_key}','${st||'A'}',this)">${ic}</span>
+      </td>`;
+    }).join('');
+    // Hitung hanya dari kolom yang ada sesi
+    const sesiKeys = rekapHariArr.filter(k=>k.ada_sesi).map(k=>k.tanggal_key);
+    const H=sesiKeys.filter(k=>r.tgl[k]==='H').length;
+    const A=sesiKeys.filter(k=>r.tgl[k]==='A').length;
+    const I=sesiKeys.filter(k=>r.tgl[k]==='I').length;
+    const S=sesiKeys.filter(k=>r.tgl[k]==='S').length;
+    const tot=H+A+I+S;
+    const pct=tot>0?Math.round(H/tot*100):0;
+    const pc=pct>=80?'#2e7d32':pct>=60?'#f57f17':'#c62828';
+    const barW=Math.max(3,Math.round(pct*40/100));
+    return `<tr>
+      <td class="rk-td center">${i+1}</td>
+      <td class="rk-td code">${r.idpps}</td>
+      <td class="rk-td nama">${r.nama}</td>
+      <td class="rk-td">${r.dom}</td>
+      <td class="rk-td">${r.tingkatan}</td>
+      ${kalCells}
+      <td class="rk-td-stat H">${H}</td>
+      <td class="rk-td-stat A">${A}</td>
+      <td class="rk-td-stat I">${I}</td>
+      <td class="rk-td-stat S">${S}</td>
+      <td class="rk-td-stat" style="min-width:70px">
+        <div class="pct-wrap">
+          <div class="pct-bar" style="background:${pc};width:${barW}px"></div>
+          <span class="pct-num" style="color:${pc}">${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== EDIT STATUS REKAP =====
+function editRekapStatus(idpps, tanggalKey, status, el) {
+  if(!tanggalKey || tanggalKey==='null') return;
+  const opts = [
+    {v:'H', l:'Hadir'},
+    {v:'A', l:'Alpha'},
+    {v:'I', l:'Izin'},
+    {v:'S', l:'Sakit'}
+  ];
+  const rect = el.getBoundingClientRect();
+  let sel = document.createElement('select');
+  sel.style.position = 'fixed';
+  sel.style.left = rect.left+'px';
+  sel.style.top = rect.top+'px';
+  sel.style.zIndex = 99999;
+  sel.style.fontSize = '14px';
+  sel.style.padding = '3px 8px';
+  opts.forEach(o=>{
+    let op = document.createElement('option');
+    op.value = o.v; op.textContent = o.l; if(o.v===status) op.selected = true;
+    sel.appendChild(op);
+  });
+  document.body.appendChild(sel);
+  sel.focus();
+  sel.onblur = ()=>{ sel.remove(); };
+  sel.onchange = async ()=>{
+    const newStatus = sel.value;
+    sel.remove();
+    if(!window.sb){ toast('Supabase belum siap','err'); return; }
+    // Cek apakah sudah ada absensi
+    const {data:exist} = await sb.from('absensi').select('id').eq('id_pps',idpps).eq('tanggal',tanggalKey).maybeSingle();
+    if(exist){
+      const {error} = await sb.from('absensi').update({status:newStatus}).eq('id',exist.id);
+      if(error) toast('Gagal update: '+error.message,'err');
+      else toast('Berhasil diupdate!','suc');
+    }else{
+      // Ambil hijri_label dari rekapHariArr
+      const hari = rekapHariArr.find(k=>k.tanggal_key===tanggalKey);
+      const {error} = await sb.from('absensi').insert({
+        id_pps:idpps, tanggal:tanggalKey, status:newStatus,
+        hijri_label: hari ? hari.hijri_label : '',
+        keterangan:'Edit manual rekap'
+      });
+      if(error) toast('Gagal tambah: '+error.message,'err');
+      else toast('Berhasil ditambah!','suc');
+    }
+    loadRekap();
+  };
+}
+
+function filterRekap(){
+  const q = document.getElementById('rekap-cari').value.trim();
+  renderRekapRows(q);
+}
+
+// ===== EXPORT REKAP EXCEL =====
+function exportRekapExcel(){
+  if(!rekapData.length){ toast('Belum ada data rekap!','err'); return; }
+  const hBulan = parseInt(document.getElementById('f-bulan-hijri').value);
+  const hTahun = parseInt(document.getElementById('f-tahun-hijri').value);
+  const namaFile = 'Rekap_' + BLN_H[hBulan] + '_' + hTahun + 'H.xlsx';
+
+  const headers = ['No','ID PPS','Nama Guru','Dom','Tingkatan',
+    ...rekapHariArr.map(k=> k.ada_sesi ? String(k.hijri_day) : k.hijri_day+'*'),
+    'H','A','I','S','%'];
+
+  const rows = rekapData.map(([idpps,r],i)=>{
+    const sesiKeys = rekapHariArr.filter(k=>k.ada_sesi).map(k=>k.tanggal_key);
+    const H=sesiKeys.filter(k=>r.tgl[k]==='H').length;
+    const A=sesiKeys.filter(k=>r.tgl[k]==='A').length;
+    const I=sesiKeys.filter(k=>r.tgl[k]==='I').length;
+    const S=sesiKeys.filter(k=>r.tgl[k]==='S').length;
+    const tot=H+A+I+S;
+    const pct=tot>0?Math.round(H/tot*100):0;
+    const kalVals=rekapHariArr.map(k=>k.ada_sesi ? (r.tgl[k.tanggal_key]||'A') : '');
+    return [i+1,r.idpps,r.nama,r.dom,r.tingkatan,...kalVals,H,A,I,S,pct+'%'];
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet([headers,...rows]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, BLN_H[hBulan]+' '+hTahun);
+  XLSX.writeFile(wb, namaFile);
+  toast('✅ Export berhasil: '+namaFile,'suc');
+}
+
+// ===== DATA GURU =====
+function renderGuru(){
+  document.getElementById('jml-guru').textContent=daftarGuru.length+' guru terdaftar';
+  const tb=document.getElementById('tb-guru');
+  if(!daftarGuru.length){ tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="ic">👥</div><p>Belum ada data guru</p></div></td></tr>'; return; }
+  tb.innerHTML=daftarGuru.map((g,i)=>`<tr><td>${i+1}</td><td><code>${g.id_pps}</code></td><td style="font-weight:600">${g.nama}</td><td>${g.dom||'—'}</td><td>${g.tingkatan||'—'}</td></tr>`).join('');
+}
+
+// ===== UPLOAD EXCEL =====
+function previewExcel(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const wb=XLSX.read(e.target.result,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const json=XLSX.utils.sheet_to_json(ws,{header:1});
+    if(json.length<2){ toast('File kosong!','err'); return; }
+    const headers=json[0].map(h=>String(h).toLowerCase().replace(/\s+/g,'').trim());
+    const iId=headers.findIndex(h=>h.includes('idpps')||h.includes('id_pps')||h==='id'||h==='noid'||h==='nopps');
+    const iNm=headers.findIndex(h=>h.includes('nama'));
+    const iDm=headers.findIndex(h=>h.includes('dom'));
+    const iTk=headers.findIndex(h=>h.includes('tingkat'));
+    prevData=[];
+    for(let i=1;i<json.length;i++){
+      const r=json[i];
+      if(!r[iNm]) continue;
+      const idVal=String(r[iId]!==undefined&&r[iId]!==null?r[iId]:'').trim();
+      if(!idVal) continue;
+      prevData.push({id_pps:idVal,nama:String(r[iNm]||'').trim(),dom:String(r[iDm]!==undefined?r[iDm]:'').trim(),tingkatan:String(r[iTk]!==undefined?r[iTk]:'').trim()});
+    }
+    document.getElementById('prev-count').textContent=prevData.length;
+    document.getElementById('prev-body').innerHTML=prevData.map((g,i)=>`<tr><td>${i+1}</td><td><code>${g.id_pps}</code></td><td style="font-weight:600">${g.nama}</td><td>${g.dom}</td><td>${g.tingkatan}</td></tr>`).join('');
+    document.getElementById('prev-wrap').style.display='block';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function importGuru(){
+  if(!sb){ toast('Hubungkan Supabase!','err'); return; }
+  if(!prevData.length) return;
+  const btn=document.getElementById('btn-import');
+  btn.disabled=true;
+  const BATCH=50; let sukses=0, gagal=0;
+  try {
+    for(let i=0;i<prevData.length;i+=BATCH){
+      const batch=prevData.slice(i,i+BATCH);
+      btn.innerHTML='<div class="loading"></div> Import '+(i+batch.length)+'/'+prevData.length+'...';
+      const {error}=await sb.from('guru').upsert(batch,{onConflict:'id_pps'});
+      if(error){ gagal+=batch.length; console.error('Batch error:',error); }
+      else sukses+=batch.length;
+    }
+    if(gagal>0) toast('⚠️ '+sukses+' berhasil, '+gagal+' gagal!','err');
+    else toast('✅ '+sukses+' guru berhasil diimport!','suc');
+    await loadGuru();
+    document.getElementById('prev-wrap').style.display='none';
+    document.getElementById('file-excel').value=''; prevData=[];
+  } catch(e){ toast('❌ '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.innerHTML='⬆️ Import ke Supabase'; }
+}
+
+// ===== TOAST =====
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+(type||'');
+  setTimeout(()=>t.className='toast',3500);
+}
+</script>
+</body>
+</html>
