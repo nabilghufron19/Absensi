@@ -36,7 +36,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--krem);color:#1a
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99}
 
 /* MAIN */
-.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-width:0}
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-width:0;transition:margin-left .25s ease}
 .topbar{background:#fff;border-bottom:1px solid var(--border);padding:12px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .tb-left{display:flex;align-items:center;gap:10px}
 .tb-title{font-size:16px;font-weight:700;color:var(--hijau-tua)}
@@ -52,8 +52,19 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--krem);color:#1a
 .content{padding:22px 26px;flex:1}
 .page{display:none}.page.active{display:block}
 
-/* Hamburger button (mobile) */
-.ham-btn{display:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:none;background:var(--krem);cursor:pointer;font-size:18px;color:var(--hijau-tua)}
+/* Hamburger button — selalu tampil di desktop & mobile */
+.ham-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:none;background:var(--krem);cursor:pointer;font-size:18px;color:var(--hijau-tua);transition:background .15s}
+.ham-btn:hover{background:#e8e0cc}
+
+/* Sidebar hidden state (desktop) */
+body.sb-hidden .sb{transform:translateX(-100%)}
+body.sb-hidden .main{margin-left:0}
+/* tombol collapse kecil yang menempel di tepi saat sidebar hidden */
+.sb-peek{display:none;position:fixed;top:50%;left:0;transform:translateY(-50%);z-index:101;
+  background:var(--hijau-tua);color:var(--emas);border:none;border-radius:0 8px 8px 0;
+  padding:14px 7px;cursor:pointer;font-size:16px;transition:all .2s;writing-mode:vertical-rl}
+body.sb-hidden .sb-peek{display:flex;align-items:center;justify-content:center}
+.sb-peek:hover{background:var(--hijau);padding-right:11px}
 
 /* CARD */
 .card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:18px}
@@ -90,6 +101,31 @@ tr:hover td{background:#fdf8f0}
 /* CHECK-IN */
 .ci-wrap{display:grid;grid-template-columns:1fr 290px;gap:18px;align-items:start}
 .ci-box{background:var(--hijau-tua);border-radius:16px;padding:32px 38px;text-align:center;position:relative;overflow:hidden}
+
+/* JAM MANUAL — compact dengan popover */
+.ci-jam-wrap{display:inline-flex;align-items:center;gap:8px;margin-bottom:3px;position:relative;z-index:2}
+.ci-jam-setting-btn{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.5);border-radius:50%;width:26px;height:26px;font-size:13px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.ci-jam-setting-btn:hover{background:rgba(201,168,76,.25);color:var(--emas);border-color:var(--emas)}
+.ci-jam-setting-btn.active{background:rgba(201,168,76,.2);color:var(--emas);border-color:var(--emas)}
+
+/* Popover */
+.ci-jam-popover{display:none;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);background:#1e4535;border:1px solid rgba(201,168,76,.35);border-radius:14px;padding:16px 18px;z-index:50;box-shadow:0 8px 32px rgba(0,0,0,.35);min-width:200px}
+.ci-jam-popover.show{display:block;animation:popIn .18s ease}
+@keyframes popIn{from{opacity:0;transform:translateX(-50%) scale(.93)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+.cjp-title{color:rgba(255,255,255,.5);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;text-align:center}
+.cjp-grid{display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:12px}
+.cjp-col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.cjp-sep{color:var(--emas);font-size:22px;font-weight:700;margin-bottom:18px;line-height:1}
+.cjp-inp{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.22);color:#fff;border-radius:8px;width:52px;padding:6px 4px;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;text-align:center;outline:none;font-family:inherit;-moz-appearance:textfield;appearance:textfield}
+.cjp-inp::-webkit-outer-spin-button,.cjp-inp::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.cjp-inp:focus{border-color:var(--emas);background:rgba(201,168,76,.15)}
+.cjp-set{width:100%;background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.5);color:var(--emas-muda);border-radius:8px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;margin-bottom:7px}
+.cjp-set:hover{background:rgba(201,168,76,.42);color:#fff}
+.cjp-lbl{color:rgba(255,255,255,.3);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.cjp-reset{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);color:rgba(255,255,255,.55);border-radius:8px;padding:7px 0;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;margin-bottom:8px}
+.cjp-reset:hover{background:rgba(255,255,255,.12);color:#fff}
+.cjp-badge{text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:20px;background:rgba(67,160,71,.15);color:#a5d6a7;border:1px solid rgba(67,160,71,.3);display:inline-block;width:100%;box-sizing:border-box}
+.cjp-badge.manual{background:rgba(201,168,76,.15);color:var(--emas-muda);border-color:rgba(201,168,76,.3)}
 .ci-box::before{content:'';position:absolute;top:-40px;right:-40px;width:170px;height:170px;border-radius:50%;background:rgba(201,168,76,.06)}
 .ci-box::after{content:'';position:absolute;bottom:-50px;left:-25px;width:200px;height:200px;border-radius:50%;background:rgba(64,145,108,.09)}
 .ci-ar{font-family:'Amiri',serif;color:var(--emas);font-size:26px;display:block;margin-bottom:3px}
@@ -152,8 +188,9 @@ tr:hover td{background:#fdf8f0}
 .btn-buka:hover{background:var(--emas-muda)}
 .btn-tutup-sesi{background:rgba(198,40,40,.25);color:#ef9a9a;border:1px solid rgba(198,40,40,.4)!important}
 .btn-tutup-sesi:hover{background:rgba(198,40,40,.4)}
-.input-hijri{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;font-family:'Amiri',serif;outline:none;width:52px;text-align:center}
+.input-hijri{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;font-family:'Amiri',serif;outline:none;width:52px;text-align:center;-moz-appearance:textfield;appearance:textfield}
 .input-hijri:focus{border-color:var(--emas)}
+.input-hijri::-webkit-outer-spin-button,.input-hijri::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .select-hijri{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;outline:none;cursor:pointer}
 .select-hijri option{background:#1a3a2a;color:#fff}
 .select-hijri:focus{border-color:var(--emas)}
@@ -191,6 +228,18 @@ tr:hover td{background:#fdf8f0}
 .rk-cell.I{background:#fff8e1;color:#f57f17}
 .rk-cell.S{background:#e3f2fd;color:#1565c0}
 .rk-cell.kosong{background:#f5f5f5;color:#ccc}
+
+/* Sel jam compact (untuk grid 3 jam per hari) */
+.rk-td-jam{text-align:center;padding:5px 2px;font-size:10px;font-weight:700;border-bottom:1px solid #f0ebe0;vertical-align:middle;min-width:22px;max-width:26px;cursor:default}
+.rk-td-jam.H{background:#e8f5e9;color:#2e7d32}
+.rk-td-jam.A{background:#fce4ec;color:#c62828}
+.rk-td-jam.I{background:#fff8e1;color:#f57f17}
+.rk-td-jam.S{background:#e3f2fd;color:#1565c0}
+.rk-td-jam.kosong{background:#fafafa;color:#ddd}
+.rk-td-jam[style*="cursor:pointer"]:hover{filter:brightness(.93)}
+
+/* Catatan jam hadir di bawah nama */
+.rk-catatan-jam{font-size:9.5px;color:var(--abu);font-weight:400;margin-top:2px;white-space:normal;line-height:1.3}
 .rk-td-stat{padding:7px 6px;text-align:center;font-size:12.5px;font-weight:700;border-bottom:1px solid #f0ebe0;white-space:nowrap}
 .rk-td-stat.H{color:#2e7d32}
 .rk-td-stat.A{color:#c62828}
@@ -241,6 +290,8 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
    ============================================= */
 @media (max-width: 768px) {
   :root { --sw: 240px; }
+  .sb-peek { display: none !important; }
+  body.sb-hidden .main { margin-left: 0; }
 
   /* Sidebar tersembunyi di luar layar */
   .sb {
@@ -271,6 +322,7 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
     grid-template-columns: 1fr;
   }
   .ci-box { padding: 22px 18px; }
+  .ci-jam-popover { min-width: 180px; }
 
   /* Stat grid 2 kolom */
   .sg { grid-template-columns: repeat(2, 1fr); }
@@ -296,6 +348,16 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
 </style>
 </head>
 <body>
+<div id="login-modal" style="position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center">
+  <form id="login-form" style="background:#fff;padding:32px 28px 22px 28px;border-radius:14px;box-shadow:0 4px 32px rgba(0,0,0,0.13);min-width:320px;max-width:90vw;display:flex;flex-direction:column;gap:16px">
+    <div style="font-size:19px;font-weight:700;color:#1a3a2a;text-align:center;margin-bottom:6px">Login Absensi Guru</div>
+    <input id="login-username" type="text" placeholder="Username" autocomplete="username" style="padding:10px 12px;font-size:15px;border-radius:8px;border:1.5px solid #ddd;outline:none" required autofocus>
+    <input id="login-password" type="password" placeholder="Password" autocomplete="current-password" style="padding:10px 12px;font-size:15px;border-radius:8px;border:1.5px solid #ddd;outline:none" required>
+    <button type="submit" style="background:#2d6a4f;color:#fff;font-weight:700;padding:10px 0;border:none;border-radius:8px;font-size:15px;cursor:pointer">Login</button>
+    <div id="login-error" style="color:#c0392b;font-size:13px;text-align:center;display:none"></div>
+  </form>
+</div>
+
 <!-- Overlay mobile -->
 <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
 
@@ -311,9 +373,12 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
     <button class="ni" onclick="go('rekap',this)"><span class="ic">📅</span>Rekap Bulanan</button>
     <button class="ni" onclick="go('guru',this)"><span class="ic">👤</span>Data Guru</button>
     <button class="ni" onclick="go('upload',this)"><span class="ic">📤</span>Upload Excel</button>
+    <button class="ni" onclick="go('analisa',this)"><span class="ic">🔬</span>Analisa Guru</button>
   </nav>
-  <div class="sb-ft">Madrasah Tarbiyah Idadiyah<br>al-Miftah · v4.2</div>
+  <div class="sb-ft">Madrasah Tarbiyah Idadiyah<br>al-Miftah · v5.0</div>
 </div>
+<!-- Tombol peek saat sidebar disembunyikan -->
+<button class="sb-peek" onclick="toggleSidebarDesktop()" title="Tampilkan sidebar">☰</button>
 
 <div class="main">
   <div class="topbar">
@@ -374,7 +439,33 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
         <div class="ci-box">
           <span class="ci-ar">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</span>
           <div class="ci-sub">Absensi Guru · Idadiyah al-Miftah</div>
-          <div class="ci-jam" id="ci-jam">00:00:00</div>
+          <div class="ci-jam-wrap" id="ci-jam-wrap">
+            <div class="ci-jam" id="ci-jam">00:00:00</div>
+            <button class="ci-jam-setting-btn" id="btn-jam-setting" onclick="toggleJamPopover(event)" title="Atur jam manual">⚙️</button>
+            <!-- Popover atur jam -->
+            <div class="ci-jam-popover" id="ci-jam-popover">
+              <div class="cjp-title">⏱ Atur Jam Manual</div>
+              <div class="cjp-grid">
+                <div class="cjp-col">
+                  <input class="cjp-inp" id="cjp-h" type="number" min="0" max="23" value="00" onclick="this.select()">
+                  <span class="cjp-lbl">JAM</span>
+                </div>
+                <span class="cjp-sep">:</span>
+                <div class="cjp-col">
+                  <input class="cjp-inp" id="cjp-m" type="number" min="0" max="59" value="00" onclick="this.select()">
+                  <span class="cjp-lbl">MNT</span>
+                </div>
+                <span class="cjp-sep">:</span>
+                <div class="cjp-col">
+                  <input class="cjp-inp" id="cjp-s" type="number" min="0" max="59" value="00" onclick="this.select()">
+                  <span class="cjp-lbl">DTK</span>
+                </div>
+              </div>
+              <button class="cjp-set" onclick="terapkanJamManual()">✅ Terapkan Jam Ini</button>
+              <button class="cjp-reset" onclick="resetJamOtomatis()" id="btn-jam-reset">🔄 Sinkron ke Jam Sekarang</button>
+              <div class="cjp-badge" id="ci-jam-mode-badge">🔄 Mode Otomatis</div>
+            </div>
+          </div>
           <div class="ci-tgl" id="ci-tgl"></div>
           <span class="ci-lbl">Ketik ID PPS lalu tekan Enter</span>
           <input type="text" class="ci-inp" id="ci-inp" placeholder="Ketik ID PPS di sini..."
@@ -442,6 +533,7 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
           <div class="leg-item"><div class="leg-dot rk-cell I" style="width:20px;height:16px">I</div> Izin</div>
           <div class="leg-item"><div class="leg-dot rk-cell S" style="width:20px;height:16px">S</div> Sakit</div>
           <div class="leg-item"><div class="leg-dot rk-cell kosong" style="width:20px;height:16px">·</div> Tidak ada sesi</div>
+          <div class="leg-item" style="margin-left:auto;color:var(--abu);font-size:11px">📌 Tiap kolom = 1 sesi harian · Klik sel untuk edit</div>
         </div>
       </div>
     </div>
@@ -487,33 +579,149 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
       </div>
     </div>
 
+    <!-- ANALISA GURU -->
+    <div class="page" id="page-analisa">
+
+      <!-- Filter Bar -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="ch" style="flex-wrap:wrap;gap:10px">
+          <div><div class="ct">🔬 Analisa Kehadiran Guru</div><div class="cs">Pola ketepatan waktu & kerajinan per guru</div></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select id="an-bulan" style="border:1.5px solid #ddd;border-radius:8px;padding:7px 12px;font-size:13px;outline:none;font-family:inherit;background:#fff">
+              <option value="1">Muharram</option><option value="2">Shafar</option>
+              <option value="3">Rabiul Awwal</option><option value="4">Rabiul Akhir</option>
+              <option value="5">Jumadal Ula</option><option value="6">Jumadal Akhirah</option>
+              <option value="7">Rajab</option><option value="8">Syaban</option>
+              <option value="9">Ramadhan</option><option value="10">Syawwal</option>
+              <option value="11">Dzulqadah</option><option value="12">Dzulhijjah</option>
+            </select>
+            <input type="number" id="an-tahun" value="1446" min="1440" max="1460" style="width:85px;border:1.5px solid #ddd;border-radius:8px;padding:7px 12px;font-size:13px;outline:none;font-family:inherit;background:#fff">
+            <button class="btn btn-g" onclick="loadAnalisa()">🔍 Analisa</button>
+            <button class="btn btn-e" onclick="exportAnalisaExcel()" id="btn-export-analisa" style="display:none">⬇️ Export Excel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div id="an-summary" style="display:none">
+        <div class="sg" style="margin-bottom:16px">
+          <div class="sc h"><div class="sc-ic">🏆</div><div class="sc-lb">Paling Rajin</div><div class="sc-val" id="an-top-nama" style="font-size:15px;line-height:1.2;margin-top:4px">—</div><div class="sc-desc" id="an-top-pct">—</div></div>
+          <div class="sc a"><div class="sc-ic">⚠️</div><div class="sc-lb">Paling Sering Absen</div><div class="sc-val" id="an-bot-nama" style="font-size:15px;line-height:1.2;margin-top:4px">—</div><div class="sc-desc" id="an-bot-pct">—</div></div>
+          <div class="sc t"><div class="sc-ic">⏰</div><div class="sc-lb">Sering Telat Check-in</div><div class="sc-val" id="an-telat-jml" style="font-size:28px">—</div><div class="sc-desc">guru terindikasi telat</div></div>
+          <div class="sc p"><div class="sc-ic">📈</div><div class="sc-lb">Rata-rata Kehadiran</div><div class="sc-val" id="an-avg-pct">—</div><div class="sc-desc">seluruh guru bulan ini</div></div>
+        </div>
+
+        <!-- Bar Chart Kehadiran -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="ch"><div class="ct">📊 Distribusi % Kehadiran</div><div class="cs">Persebaran tingkat kehadiran semua guru</div></div>
+          <div style="padding:16px 18px">
+            <div id="an-chart-bars" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+        </div>
+
+        <!-- Tabel Analisa Detail -->
+        <div class="card">
+          <div class="ch" style="flex-wrap:wrap;gap:8px">
+            <div><div class="ct">📋 Detail Analisa Per Guru</div><div class="cs" id="an-tbl-sub">—</div></div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <select id="an-sort" onchange="renderAnalisaTable()" style="border:1.5px solid #ddd;border-radius:8px;padding:6px 11px;font-size:12.5px;outline:none;font-family:inherit;background:#fff">
+                <option value="pct-desc">% Hadir ↓</option>
+                <option value="pct-asc">% Hadir ↑</option>
+                <option value="telat-desc">Paling Lambat Check-in</option>
+                <option value="cepat-asc">Paling Cepat Check-in</option>
+                <option value="alpha-desc">Paling Banyak Alpha</option>
+                <option value="nama">Nama A-Z</option>
+              </select>
+              <div style="position:relative">
+                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--abu);font-size:13px">🔍</span>
+                <input type="text" id="an-cari" placeholder="Cari guru..." oninput="renderAnalisaTable()" style="border:1.5px solid #ddd;border-radius:8px;padding:7px 12px 7px 32px;font-size:12.5px;outline:none;font-family:inherit;background:#fff;width:170px">
+              </div>
+            </div>
+          </div>
+          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+            <table id="tbl-analisa" style="min-width:820px">
+              <thead>
+                <tr>
+                  <th style="min-width:36px">#</th>
+                  <th style="min-width:150px">Nama Guru</th>
+                  <th style="min-width:70px">Dom</th>
+                  <th style="min-width:90px">Tingkatan</th>
+                  <th style="min-width:55px;text-align:center">✅ H</th>
+                  <th style="min-width:55px;text-align:center">❌ A</th>
+                  <th style="min-width:55px;text-align:center">📋 I</th>
+                  <th style="min-width:55px;text-align:center">🤒 S</th>
+                  <th style="min-width:100px;text-align:center">📊 % Hadir</th>
+                  <th style="min-width:110px;text-align:center">⏱ Rata-rata Check-in</th>
+                  <th style="min-width:90px;text-align:center">⚡ Paling Cepat</th>
+                  <th style="min-width:90px;text-align:center">🐢 Paling Lambat</th>
+                  <th style="min-width:120px;text-align:center">Kategori</th>
+                  <th style="min-width:130px">Catatan</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-analisa">
+                <tr><td colspan="14"><div class="empty"><div class="ic">🔬</div><p>Pilih bulan lalu klik Analisa</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Legend Pola -->
+          <div style="display:flex;gap:14px;padding:10px 18px;border-top:1px solid var(--border);flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--abu);display:flex;align-items:center;gap:5px"><span style="background:#e8f5e9;color:#2e7d32;padding:2px 7px;border-radius:10px;font-weight:700;font-size:10px">⚡ Sangat Cepat</span> Check-in &lt; 5 menit</span>
+            <span style="font-size:11px;color:var(--abu);display:flex;align-items:center;gap:5px"><span style="background:#e3f2fd;color:#1565c0;padding:2px 7px;border-radius:10px;font-weight:700;font-size:10px">✅ Tepat Waktu</span> 5–15 menit</span>
+            <span style="font-size:11px;color:var(--abu);display:flex;align-items:center;gap:5px"><span style="background:#fff8e1;color:#e65100;padding:2px 7px;border-radius:10px;font-weight:700;font-size:10px">⏰ Agak Lambat</span> 15–30 menit</span>
+            <span style="font-size:11px;color:var(--abu);display:flex;align-items:center;gap:5px"><span style="background:#fce4ec;color:#c62828;padding:2px 7px;border-radius:10px;font-weight:700;font-size:10px">🐢 Sering Telat</span> &gt; 30 menit</span>
+            <span style="font-size:11px;color:var(--abu);display:flex;align-items:center;gap:5px"><span style="background:#f5f5f5;color:#616161;padding:2px 7px;border-radius:10px;font-weight:700;font-size:10px">📵 Tanpa Data</span> Sesi lama (sebelum update)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state sebelum analisa -->
+      <div id="an-empty" style="text-align:center;padding:60px 20px;color:var(--abu)">
+        <div style="font-size:52px;margin-bottom:14px">🔬</div>
+        <div style="font-size:15px;font-weight:700;color:var(--hijau-tua);margin-bottom:6px">Analisa Kehadiran Guru</div>
+        <div style="font-size:13px">Pilih bulan Hijriah di atas, lalu klik <strong>Analisa</strong><br>untuk melihat pola ketepatan waktu setiap guru.</div>
+      </div>
+
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== LOGIN SIMPLE =====
+document.addEventListener('DOMContentLoaded',()=>{
+  const loginModal = document.getElementById('login-modal');
+  const loginForm = document.getElementById('login-form');
+  if(loginForm){
+    loginForm.onsubmit = function(e){
+      e.preventDefault();
+      const u = document.getElementById('login-username').value.trim();
+      const p = document.getElementById('login-password').value;
+      if(u==='Nabil' && p==='907076'){
+        loginModal.style.display='none';
+        document.body.style.overflow='auto';
+      }else{
+        const err = document.getElementById('login-error');
+        err.textContent = 'Username atau password salah!';
+        err.style.display = 'block';
+      }
+    };
+    document.body.style.overflow='hidden';
+  }
+});
+
 // ===== SUPABASE CONFIG =====
 // ⚠️ PENTING: Aktifkan Row Level Security (RLS) di semua tabel Supabase Anda!
 // Tabel yang perlu RLS: guru, absensi, kalender_hijriah, sesi_absensi
 // Key anon ini aman selama RLS dikonfigurasi dengan benar.
 //
-// SQL untuk membuat tabel sesi_absensi (jalankan sekali di Supabase SQL Editor):
-// ----------------------------------------------------------------------------
-// create table if not exists sesi_absensi (
-//   id            bigserial primary key,
-//   tanggal_key   text unique not null,
-//   hijri_label   text,
-//   hijri_day     int,
-//   hijri_month   int,
-//   hijri_year    int,
-//   is_aktif      boolean default true,
-//   dibuka_pada   text,
-//   created_at    timestamptz default now()
-// );
-// ----------------------------------------------------------------------------
-const SB_URL = 'https://ttftmzfncjtfyrphanlw.supabase.co';
-const SB_KEY = 'sb_publishable_DTSgzhCZp4dQXKUgANcqiQ_6dL-NxYR';
+// Format tanggal_key: H-YYYY-MM-DD (1 sesi per hari, tanpa jam_ke)
+// kalender_hijriah.tanggal_sesi = H-YYYY-MM-DD (sama dengan tanggal_key)
+//
+// SQL untuk membuat tabel (jalankan sekali di Supabase SQL Editor) — lihat file SQL terpisah.
+// ══════════════════════════════════════════════════════════════
+const SB_URL = 'https://rttcqjfvpcpdxodfwzeo.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0dGNxamZ2cGNwZHhvZGZ3emVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0OTAwMjEsImV4cCI6MjA5MzA2NjAyMX0.F3CmOnIgbwRNaUIGs7zO2-HQ0Wln8xqgw0BnhcS3GM8';
 
 // ===== KONSTANTA =====
 const BLN_H = ['','Muharram','Shafar','Rabiul Awwal','Rabiul Akhir','Jumadal Ula','Jumadal Akhirah','Rajab','Syaban','Ramadhan','Syawwal','Dzulqadah','Dzulhijjah'];
@@ -534,24 +742,48 @@ let checkinRefreshTimer = null;
 let sesiPollTimer = null;       // polling sesi dari Supabase
 let activePage = 'dashboard';
 
-// ===== MOBILE SIDEBAR =====
+// ===== SIDEBAR TOGGLE =====
 function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  const overlay = document.getElementById('sb-overlay');
-  sb.classList.toggle('open');
-  overlay.classList.toggle('show');
+  // Di mobile: pakai overlay slide-in
+  if (window.innerWidth <= 768) {
+    const sb = document.getElementById('sidebar');
+    const overlay = document.getElementById('sb-overlay');
+    sb.classList.toggle('open');
+    overlay.classList.toggle('show');
+  } else {
+    // Di desktop: sembunyikan/tampilkan sidebar
+    toggleSidebarDesktop();
+  }
 }
+
+function toggleSidebarDesktop() {
+  document.body.classList.toggle('sb-hidden');
+  // Simpan preferensi
+  localStorage.setItem('sb_hidden', document.body.classList.contains('sb-hidden') ? '1' : '0');
+}
+
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sb-overlay').classList.remove('show');
 }
 
+// Restore preferensi sidebar saat load
+(function() {
+  if (localStorage.getItem('sb_hidden') === '1') {
+    document.body.classList.add('sb-hidden');
+  }
+})();
+
 // ===== HIJRIAH UTILS =====
 function gregorianToHijri(year, month, day) {
   try {
-    const d = new Date(year, month-1, day);
+    // Pakai jam 12:00:00 UTC agar tidak terkena efek timezone shift
+    // (new Date(y,m,d) = jam 00:00 lokal = jam 17:00 UTC hari sebelumnya di WIB)
+    // yang menyebabkan konversi Hijriah meleset 1 hari
+    const d = new Date(Date.UTC(year, month-1, day, 12, 0, 0));
     const hParts = new Intl.DateTimeFormat('id-u-ca-islamic-umalqura', {
-      day:'numeric', month:'numeric', year:'numeric'
+      day:'numeric', month:'numeric', year:'numeric',
+      timeZone: 'UTC'
     }).formatToParts(d);
     let hd=1,hm=1,hy=1446;
     hParts.forEach(p=>{
@@ -617,6 +849,20 @@ async function loadSesi() {
     // Sync ke localStorage sebagai cache offline
     if (sesiAktif) localStorage.setItem('sesi_absensi', JSON.stringify(sesiAktif));
     else localStorage.removeItem('sesi_absensi');
+    // Terapkan jam_offset dari Supabase jika ada (sinkron antar perangkat)
+    if (sesiAktif && sesiAktif.jam_offset !== null && sesiAktif.jam_offset !== undefined) {
+      const setAt = sesiAktif.jam_offset_set_at ? new Date(sesiAktif.jam_offset_set_at).getTime() : null;
+      if (setAt) {
+        const targetMs = setAt + sesiAktif.jam_offset;
+        manualOffset   = targetMs - Date.now();
+      } else {
+        manualOffset = sesiAktif.jam_offset;
+      }
+      if (typeof setJamModeBadge === 'function') setJamModeBadge('manual');
+    } else if (sesiAktif && sesiAktif.jam_offset === null) {
+      manualOffset = null;
+      if (typeof setJamModeBadge === 'function') setJamModeBadge('otomatis');
+    }
   } catch(e) {
     console.warn('loadSesi error, fallback ke localStorage:', e.message);
     try { sesiAktif = JSON.parse(localStorage.getItem('sesi_absensi')||'null'); } catch(_){ sesiAktif=null; }
@@ -629,14 +875,41 @@ function startSesiPoll() {
   if (sesiPollTimer) clearInterval(sesiPollTimer);
   sesiPollTimer = setInterval(async () => {
     if (!sb || activePage !== 'checkin') return;
-    const sebelumnya = sesiAktif ? sesiAktif.tanggal_key : null;
+    const sebelumnya      = sesiAktif ? sesiAktif.tanggal_key : null;
+    const offsetSebelumnya = sesiAktif ? sesiAktif.jam_offset  : undefined;
     await loadSesi();
     const sekarang = sesiAktif ? sesiAktif.tanggal_key : null;
     if (sebelumnya !== sekarang) {
-      // Sesi berubah dari perangkat lain
+      // Sesi berganti — reset log & stats agar tidak terbawa dari sesi lama
+      logHariIni = [];
+      renderLog();
       updateSideStats();
       if (sekarang) toast('🔄 Sesi diperbarui: ' + sesiAktif.hijri_label, '');
       else toast('🔒 Sesi telah ditutup dari perangkat lain.', '');
+    }
+    // Sinkronkan jam_offset dari Supabase ke semua perangkat
+    if (sesiAktif) {
+      const offsetBaru = sesiAktif.jam_offset;
+      if (offsetBaru !== offsetSebelumnya) {
+        if (offsetBaru !== null && offsetBaru !== undefined) {
+          // Ada offset baru → terapkan
+          // offset disimpan relatif terhadap waktu saat di-set (jam_offset_set_at)
+          // kita rekonstruksi: target = set_at + offset, lalu offset_baru = target - now
+          const setAt  = sesiAktif.jam_offset_set_at ? new Date(sesiAktif.jam_offset_set_at).getTime() : null;
+          if (setAt) {
+            const targetMs  = setAt + offsetBaru;          // jam yang dimaksud
+            manualOffset    = targetMs - Date.now();        // selisih ke jam lokal sekarang
+          } else {
+            manualOffset = offsetBaru;
+          }
+          setJamModeBadge('manual');
+          toast('⏱ Jam disetel dari perangkat lain.', '');
+        } else {
+          // Offset dihapus → balik otomatis
+          manualOffset = null;
+          setJamModeBadge('otomatis');
+        }
+      }
     }
   }, 15000);
 }
@@ -650,35 +923,39 @@ function renderSesi() {
   if (sesiAktif) {
     box.className = 'sesi-box aktif';
     tglH.textContent = sesiAktif.hijri_label;
-    tglM.textContent = 'Tanggal sesi: ' + (sesiAktif.tanggal_key || '—');
+    tglM.textContent = sesiAktif.tanggal_key || '—';
     acts.innerHTML = `
       <div class="sesi-status buka">🟢 Sesi Aktif</div>
       <button class="btn-sesi btn-tutup-sesi" onclick="tutupSesi()">🔒 Tutup Sesi</button>
     `;
     document.getElementById('tgl-top').textContent = sesiAktif.hijri_label;
     document.getElementById('ci-tgl').textContent = sesiAktif.hijri_label + ' · ' + (sesiAktif.tanggal_key || '');
+    // Reset counter tampilan dulu ke 0, baru query actual
+    const elH = document.getElementById('ci-hadir');
+    const elA = document.getElementById('ci-alpha');
+    if(elH) elH.textContent = '0';
+    if(elA) elA.textContent = daftarGuru.length || '—';
   } else {
     box.className = 'sesi-box';
     tglH.textContent = 'Belum ada sesi aktif';
     tglM.textContent = 'Tentukan tanggal Hijriah lalu buka sesi';
     acts.innerHTML = buildBukaSesiForm();
-    const hh = todayHijri();
-    setTimeout(()=>{
-      const ed=document.getElementById('inp-hd'), em=document.getElementById('inp-hm'), ey=document.getElementById('inp-hy');
-      if(ed) ed.value=hh.day;
-      if(em) em.value=hh.month;
-      if(ey) ey.value=hh.year;
-    }, 50);
   }
 }
 
 function buildBukaSesiForm() {
+  // Gunakan pengaturan terakhir jika ada, fallback ke hari ini
+  let last = null;
+  try { last = JSON.parse(localStorage.getItem('sesi_last_setting')||'null'); } catch(e){}
   const hh = todayHijri();
-  const blnOpts = BLN_H.slice(1).map((b,i)=>`<option value="${i+1}"${i+1===hh.month?' selected':''}>${b}</option>`).join('');
+  const hd   = last ? last.hd   : hh.day;
+  const hm   = last ? last.hm   : hh.month;
+  const hy   = last ? last.hy   : hh.year;
+  const blnOpts = BLN_H.slice(1).map((b,i)=>`<option value="${i+1}"${i+1===hm?' selected':''}>${b}</option>`).join('');
   return `
-    <input type="number" class="input-hijri" id="inp-hd" value="${hh.day}" min="1" max="30" placeholder="Tgl">
+    <input type="number" class="input-hijri" id="inp-hd" value="${hd}" min="1" max="30" placeholder="Tgl">
     <select class="select-hijri" id="inp-hm">${blnOpts}</select>
-    <input type="number" class="input-hijri" id="inp-hy" value="${hh.year}" min="1440" max="1460" style="width:65px" placeholder="Tahun">
+    <input type="number" class="input-hijri" id="inp-hy" value="${hy}" min="1440" max="1460" style="width:65px" placeholder="Tahun">
     <button class="btn-sesi btn-buka" onclick="bukaSesi()">🟢 Buka Sesi</button>
   `;
 }
@@ -691,26 +968,31 @@ async function bukaSesi() {
   if(hd<1||hd>30||hm<1||hm>12||hy<1400){ toast('Tanggal Hijriah tidak valid!','err'); return; }
 
   const tglKey = `H-${hy}-${String(hm).padStart(2,'0')}-${String(hd).padStart(2,'0')}`;
-  const label = hijriLabel(hd, hm, hy);
+  const label  = hijriLabel(hd, hm, hy);
 
   // Tutup semua sesi aktif dulu (hanya boleh 1 sesi aktif)
   await sb.from('sesi_absensi').update({ is_aktif: false }).eq('is_aktif', true);
 
-  // Buka sesi baru di Supabase
+  // Buka sesi baru di Supabase — simpan dibuka_jam (timestamptz) untuk analisa ketepatan
+  const dibuka_jam = new Date().toISOString();
   const { data: sesiBaru, error: sesiErr } = await sb.from('sesi_absensi').upsert({
     tanggal_key: tglKey,
     hijri_label: label,
     hijri_day: hd, hijri_month: hm, hijri_year: hy,
     is_aktif: true,
-    dibuka_pada: today()
+    dibuka_pada: today(),
+    dibuka_jam: dibuka_jam
   }, { onConflict: 'tanggal_key' }).select().single();
 
   if (sesiErr) { toast('❌ Gagal buka sesi: ' + sesiErr.message, 'err'); return; }
 
   sesiAktif = sesiBaru;
   localStorage.setItem('sesi_absensi', JSON.stringify(sesiAktif));
+  localStorage.setItem('sesi_last_setting', JSON.stringify({ hd, hm, hy }));
+  logHariIni = [];
+  renderLog();
 
-  // Simpan juga ke kalender_hijriah untuk keperluan rekap
+  // Simpan ke kalender_hijriah untuk keperluan rekap
   const { error: kalErr } = await sb.from('kalender_hijriah').upsert({
     tanggal_sesi: tglKey,
     hijri_day: hd, hijri_month: hm, hijri_year: hy,
@@ -720,7 +1002,7 @@ async function bukaSesi() {
 
   renderSesi();
   updateSideStats();
-  toast('✅ Sesi absensi ' + label + ' dibuka!', 'suc');
+  toast('✅ Sesi ' + label + ' dibuka!', 'suc');
 }
 
 async function tutupSesi() {
@@ -729,8 +1011,10 @@ async function tutupSesi() {
 
   if(sb && daftarGuru.length > 0){
     const tgl = sesiAktif.tanggal_key;
+    // Ambil semua id_pps yang sudah punya record di sesi ini (status apapun: H/I/S/A)
     const {data:sudahAbsen} = await sb.from('absensi').select('id_pps').eq('tanggal', tgl);
     const sudahIds = new Set((sudahAbsen||[]).map(a=>a.id_pps));
+    // Hanya guru yang SAMA SEKALI belum ada record yang di-alpha
     const alphaList = daftarGuru
       .filter(g => !sudahIds.has(g.id_pps))
       .map(g => ({
@@ -773,7 +1057,137 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('f-bulan-hijri').value = hh.month;
   document.getElementById('f-tahun-hijri').value = hh.year;
 
-  setInterval(()=>{ document.getElementById('ci-jam').textContent = fmtJam(new Date()); }, 1000);
+  // ===== JAM MANUAL — seperti jam dinding =====
+  // manualOffset: selisih milidetik antara jam manual dan jam sistem
+  // null = mode otomatis (ikut jam sistem)
+  let manualOffset = null;
+  let jamInterval = null;
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+
+  // Ambil objek Date yang mewakili "jam tampilan sekarang"
+  function getDisplayTime() {
+    if (manualOffset !== null) {
+      return new Date(Date.now() + manualOffset);
+    }
+    return new Date();
+  }
+
+  // Update input di popover sesuai waktu tampilan terkini
+  function syncPopoverInputs() {
+    const t = getDisplayTime();
+    const h = document.getElementById('cjp-h');
+    const m = document.getElementById('cjp-m');
+    const s = document.getElementById('cjp-s');
+    if(h) h.value = pad2(t.getHours());
+    if(m) m.value = pad2(t.getMinutes());
+    if(s) s.value = pad2(t.getSeconds());
+  }
+
+  function tickJam() {
+    document.getElementById('ci-jam').textContent = fmtJam(getDisplayTime());
+  }
+
+  window.toggleJamPopover = function(e) {
+    e.stopPropagation();
+    const pop = document.getElementById('ci-jam-popover');
+    const btn = document.getElementById('btn-jam-setting');
+    const isOpen = pop.classList.contains('show');
+    if (!isOpen) syncPopoverInputs(); // tampilkan nilai terkini saat buka
+    pop.classList.toggle('show');
+    btn.classList.toggle('active');
+  };
+
+  // Tutup popover saat klik di luar
+  document.addEventListener('click', function(e) {
+    const pop = document.getElementById('ci-jam-popover');
+    const btn = document.getElementById('btn-jam-setting');
+    if (pop && pop.classList.contains('show') && !pop.contains(e.target) && e.target !== btn) {
+      pop.classList.remove('show');
+      if(btn) btn.classList.remove('active');
+    }
+  });
+
+  // Terapkan jam dari input — disimpan ke Supabase agar sinkron semua perangkat
+  window.terapkanJamManual = async function() {
+    const h = parseInt(document.getElementById('cjp-h').value) || 0;
+    const m = parseInt(document.getElementById('cjp-m').value) || 0;
+    const s = parseInt(document.getElementById('cjp-s').value) || 0;
+
+    const target = new Date();
+    target.setHours(Math.min(23, Math.max(0, h)));
+    target.setMinutes(Math.min(59, Math.max(0, m)));
+    target.setSeconds(Math.min(59, Math.max(0, s)));
+    target.setMilliseconds(0);
+
+    const setAt   = Date.now();
+    const offset  = target.getTime() - setAt; // ms
+
+    // Simpan ke Supabase: offset + waktu saat disimpan
+    if (sb) {
+      const { error } = await sb
+        .from('sesi_absensi')
+        .update({ jam_offset: offset, jam_offset_set_at: new Date(setAt).toISOString() })
+        .eq('is_aktif', true);
+      if (error) {
+        console.warn('jam_offset update error:', error.message);
+        toast('⚠️ Lokal saja — jalankan migrasi SQL agar sinkron antar perangkat.', '');
+      } else {
+        toast('⏱ Jam diset ' + pad2(h) + ':' + pad2(m) + ':' + pad2(s) + ' — sinkron ke semua perangkat!', 'suc');
+      }
+    } else {
+      toast('⏱ Jam diset ' + pad2(h) + ':' + pad2(m) + ':' + pad2(s) + ' (lokal).', '');
+    }
+
+    manualOffset = offset;
+    document.getElementById('ci-jam').textContent = fmtJam(getDisplayTime());
+    setJamModeBadge('manual');
+
+    const pop = document.getElementById('ci-jam-popover');
+    const btn = document.getElementById('btn-jam-setting');
+    if(pop) pop.classList.remove('show');
+    if(btn) btn.classList.remove('active');
+  };
+
+  // Reset ke jam sistem — hapus offset dari Supabase agar sinkron semua perangkat
+  window.resetJamOtomatis = async function() {
+    manualOffset = null;
+    setJamModeBadge('otomatis');
+    syncPopoverInputs();
+    if (sb) {
+      await sb.from('sesi_absensi')
+        .update({ jam_offset: null, jam_offset_set_at: null })
+        .eq('is_aktif', true);
+    }
+    toast('🔄 Jam dikembalikan ke waktu sistem di semua perangkat.', '');
+  };
+
+  // Tetap expose adjustManualTime untuk kompatibilitas (opsional, tidak dipakai di UI baru)
+  window.adjustManualTime = function(unit, delta) {
+    const t = getDisplayTime();
+    if (unit === 'hour')   t.setHours(t.getHours() + delta);
+    if (unit === 'minute') t.setMinutes(t.getMinutes() + delta);
+    if (unit === 'second') t.setSeconds(t.getSeconds() + delta);
+    manualOffset = t.getTime() - Date.now();
+    document.getElementById('ci-jam').textContent = fmtJam(getDisplayTime());
+    syncPopoverInputs();
+    setJamModeBadge('manual');
+  };
+
+  function setJamModeBadge(mode) {
+    const badge = document.getElementById('ci-jam-mode-badge');
+    if (!badge) return;
+    if (mode === 'manual') {
+      badge.textContent = '⏱ Mode Manual';
+      badge.className = 'cjp-badge manual';
+    } else {
+      badge.textContent = '🔄 Mode Otomatis';
+      badge.className = 'cjp-badge';
+    }
+  }
+
+  jamInterval = setInterval(tickJam, 1000);
+  setJamModeBadge('otomatis');
   connect(true);
 });
 
@@ -783,8 +1197,8 @@ function go(nama, btn){
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
   document.getElementById('page-'+nama).classList.add('active');
   if(btn) btn.classList.add('on');
-  const tt = {dashboard:'Dashboard',checkin:'Layar Check-in Guru',rekap:'Rekap Bulanan',guru:'Data Guru',upload:'Upload Data Guru'};
-  document.getElementById('page-title').textContent = tt[nama];
+  const tt = {dashboard:'Dashboard',checkin:'Layar Check-in Guru',rekap:'Rekap Bulanan',guru:'Data Guru',upload:'Upload Data Guru',analisa:'🔬 Analisa Kehadiran Guru'};
+  document.getElementById('page-title').textContent = tt[nama]||nama;
   activePage = nama;
 
   // Tutup sidebar di mobile setelah navigasi
@@ -803,6 +1217,12 @@ function go(nama, btn){
   }
   if(nama==='guru') renderGuru();
   if(nama==='dashboard') loadDashboard();
+  if(nama==='analisa'){
+    // Sync filter bulan ke bulan Hijriah saat ini
+    const hh = todayHijri();
+    document.getElementById('an-bulan').value = hh.month;
+    document.getElementById('an-tahun').value = hh.year;
+  }
 }
 
 // ===== AUTO-REFRESH =====
@@ -886,15 +1306,28 @@ async function doCheckin(){
 
   const tgl = getTanggalSesi();
   if(!tgl){ showFb('err','⚠️ Sesi Belum Dibuka','Buka sesi absensi dulu!','notfound'); inp.value=''; setTimeout(clearFb,3500); return; }
+
+  // Pastikan sesi ada di sesi_absensi (jaga-jaga FK constraint)
+  await sb.from('sesi_absensi').upsert({
+    tanggal_key: tgl,
+    hijri_label: sesiAktif.hijri_label,
+    hijri_day: sesiAktif.hijri_day,
+    hijri_month: sesiAktif.hijri_month,
+    hijri_year: sesiAktif.hijri_year,
+    is_aktif: true,
+    dibuka_pada: today()
+  }, { onConflict: 'tanggal_key', ignoreDuplicates: true });
+
+  // Cek duplikat per hari
   const {data:exist}=await sb.from('absensi').select('id,status').eq('id_pps',idpps).eq('tanggal',tgl).maybeSingle();
   if(exist){
     const lbl={H:'Hadir',A:'Alpha',I:'Izin',S:'Sakit'};
     showFb('err',guru.nama,guru.dom+' · '+guru.tingkatan,'sudah');
-    document.getElementById('fb-dt').textContent = `Status ${sesiAktif.hijri_label}: ${lbl[exist.status]||exist.status}`;
+    document.getElementById('fb-dt').textContent = `Sudah tercatat ${lbl[exist.status]||exist.status} di sesi ini`;
     inp.value=''; setTimeout(clearFb,3500); return;
   }
 
-  const ket = 'Check-in mandiri · ' + sesiAktif.hijri_label;
+  const ket = 'Check-in · ' + sesiAktif.hijri_label;
   const {error}=await sb.from('absensi').insert({
     id_pps:idpps, tanggal:tgl, status:'H', keterangan:ket,
     hijri_label: sesiAktif.hijri_label
@@ -902,6 +1335,7 @@ async function doCheckin(){
   if(error){ showFb('err','❌ Gagal',error.message,'notfound'); }
   else {
     showFb('ok',guru.nama,guru.dom+' · '+guru.tingkatan,'hadir');
+    document.getElementById('fb-dt').textContent = `✅ Tercatat Hadir`;
     logHariIni.unshift({nama:guru.nama,dom:guru.dom,waktu:new Date()});
     renderLog(); updateSideStats();
   }
@@ -929,7 +1363,7 @@ function renderLog(){
     </div>`).join('');
 }
 
-// FIX: Alpha = total guru - yang hadir (bukan yang ber-status 'A' di DB)
+// FIX: Alpha = total guru - yang hadir (per sesi jam aktif)
 async function updateSideStats(){
   if(!sb) return;
   const tgl=getTanggalSesi();
@@ -989,7 +1423,7 @@ async function loadDashboard(){
   </tr>`).join('');
 }
 
-// ===== REKAP BULANAN — BERBASIS SESI HIJRIAH =====
+// ===== REKAP BULANAN — 1 SESI PER HARI =====
 async function loadRekap(){
   if(!sb){ toast('Hubungkan Supabase!','err'); return; }
   const hBulan = parseInt(document.getElementById('f-bulan-hijri').value);
@@ -1007,7 +1441,8 @@ async function loadRekap(){
   rekapData=[]; rekapHariArr=[];
 
   thead.innerHTML='';
-  tbody.innerHTML=`<tr><td colspan="9">
+  const colspanLoading = 5 + 30 + 5; // 5 kiri + 30 hari + 5 stat
+  tbody.innerHTML=`<tr><td colspan="${colspanLoading}">
     <div class="rekap-loading">
       <div class="spin"></div>
       <p>Memuat rekap ${bulanLabel}...</p>
@@ -1015,8 +1450,7 @@ async function loadRekap(){
   </td></tr>`;
   sub.textContent = '';
 
-  // 1. Ambil semua sesi (kalender_hijriah) untuk bulan & tahun Hijriah ini
-  //    tanggal_sesi di sini sebenarnya adalah tglKey format H-YYYY-MM-DD
+  // 1. Ambil semua hari di kalender_hijriah bulan ini
   const {data:sesiList, error:sesiErr} = await sb
     .from('kalender_hijriah')
     .select('tanggal_sesi,hijri_day,hijri_label,hijri_month,hijri_year')
@@ -1025,33 +1459,53 @@ async function loadRekap(){
     .order('hijri_day', {ascending: true});
   if(sesiErr){ toast('Gagal ambil kalender: '+sesiErr.message,'err'); tbody.innerHTML=''; return; }
 
-  // 2. Bangun 30 kolom hari untuk sebulan penuh (1–30)
-  //    Kolom yang ada sesinya = ada data di sesiList, kosong = belum ada sesi
+  // 2. Ambil sesi_absensi untuk tahu mana yang sudah pernah dibuka
+  const tglKeyArr = (sesiList||[]).map(s=>s.tanggal_sesi);
+  let sesiStatusMap = {}; // tanggal_key -> {adaSesi, masihAktif}
+  if(tglKeyArr.length > 0){
+    const {data:sj} = await sb.from('sesi_absensi')
+      .select('tanggal_key,is_aktif')
+      .in('tanggal_key', tglKeyArr);
+    (sj||[]).forEach(s=>{
+      sesiStatusMap[s.tanggal_key] = {adaSesi:true, masihAktif:!!s.is_aktif};
+    });
+  }
+  // Sesi yang aktif sekarang
+  if(sesiAktif && sesiAktif.tanggal_key){
+    sesiStatusMap[sesiAktif.tanggal_key] = {adaSesi:true, masihAktif:true};
+  }
+
+  // 3. Bangun kalData: satu entry per hari 1-30
   const kalData = [];
   for(let i=1; i<=30; i++){
     const s = (sesiList||[]).find(x=>x.hijri_day===i);
+    const tglKey = s ? s.tanggal_sesi
+      : `H-${hTahun}-${String(hBulan).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+    const ss = sesiStatusMap[tglKey] || {adaSesi:false, masihAktif:false};
     kalData.push({
       hijri_day: i,
       hijri_label: `${i} ${BLN_H[hBulan]} ${hTahun}`,
-      tanggal_key: s ? s.tanggal_sesi : null, // null = belum ada sesi
-      ada_sesi: !!s
+      tglKey,
+      adaHari: !!s,
+      adaSesi: ss.adaSesi,
+      masihAktif: ss.masihAktif
     });
   }
 
-  // 3. Ambil absensi untuk semua tglKey yang ada sesinya
-  const tglArr = kalData.map(k=>k.tanggal_key).filter(Boolean);
+  // 4. Ambil semua absensi untuk tglKey yang ada sesinya
+  const semuaTglKey = kalData.filter(k=>k.adaSesi).map(k=>k.tglKey);
   let absenData = [];
-  if(tglArr.length > 0) {
+  if(semuaTglKey.length > 0){
     const absenRes = await sb
       .from('absensi')
-      .select('id_pps,status,tanggal,guru(nama,dom,tingkatan)')
-      .in('tanggal', tglArr)
+      .select('id_pps,status,tanggal,keterangan,guru(nama,dom,tingkatan)')
+      .in('tanggal', semuaTglKey)
       .order('tanggal');
     if(absenRes.error){ toast('Gagal ambil absensi: '+absenRes.error.message,'err'); tbody.innerHTML=''; return; }
     absenData = absenRes.data || [];
   }
 
-  // 4. Bangun map guru
+  // 5. Bangun map guru
   const map={};
   daftarGuru.forEach(g=>{
     map[g.id_pps]={nama:g.nama, dom:g.dom||'—', tingkatan:g.tingkatan||'—', idpps:g.id_pps, tgl:{}};
@@ -1064,12 +1518,11 @@ async function loadRekap(){
     map[a.id_pps].tgl[a.tanggal]=a.status;
   });
 
-  // 5. Untuk kolom yang ADA sesi: jika guru tidak absen → Alpha
-  //    Untuk kolom yang TIDAK ada sesi: biarkan kosong (undefined)
+  // 6. Isi Alpha untuk sesi yang sudah DITUTUP
   kalData.forEach(k=>{
-    if(k.ada_sesi && k.tanggal_key){
+    if(k.adaSesi && !k.masihAktif){
       Object.values(map).forEach(r=>{
-        if(!r.tgl[k.tanggal_key]) r.tgl[k.tanggal_key]='A';
+        if(!r.tgl[k.tglKey]) r.tgl[k.tglKey]='A';
       });
     }
   });
@@ -1077,13 +1530,11 @@ async function loadRekap(){
   rekapHariArr = kalData;
   rekapData = Object.entries(map).sort((a,b)=>a[1].nama.localeCompare(b[1].nama));
 
-  // 6. Render header tabel
-  const thHariNum = kalData.map(k=>`<th class="rk-th-hari" title="${k.hijri_label}"${!k.ada_sesi?' style="opacity:.35"':''}>${k.hijri_day}</th>`).join('');
-  const thNamaHari = kalData.map(k=>`<th class="rk-th-namahari"${!k.ada_sesi?' style="opacity:.35"':''}>${k.ada_sesi?'✓':'·'}</th>`).join('');
+  // 7. Render header tabel — 1 kolom per hari
   const colKiri = `
     <th class="rk-th-kiri center" rowspan="2">#</th>
     <th class="rk-th-kiri" rowspan="2">ID PPS</th>
-    <th class="rk-th-kiri" rowspan="2" style="min-width:160px">Nama Guru</th>
+    <th class="rk-th-kiri" rowspan="2" style="min-width:150px">Nama Guru</th>
     <th class="rk-th-kiri" rowspan="2">Dom</th>
     <th class="rk-th-kiri" rowspan="2">Tingkat</th>`;
   const colStat = `
@@ -1092,15 +1543,26 @@ async function loadRekap(){
     <th class="rk-th-stat" rowspan="2" style="color:#f57f17">I</th>
     <th class="rk-th-stat" rowspan="2" style="color:#1565c0">S</th>
     <th class="rk-th-stat" rowspan="2">%</th>`;
+
+  const thHari = kalData.map(k=>{
+    const opaq = !k.adaHari ? ' style="opacity:.3"' : '';
+    return `<th class="rk-th-hari"${opaq} title="${k.hijri_label}">${k.hijri_day}</th>`;
+  }).join('');
+
+  const thNamaHari = kalData.map(k=>{
+    const active = k.adaSesi ? '' : ' style="opacity:.3"';
+    return `<th class="rk-th-namahari"${active}>${k.adaSesi?(k.masihAktif?'🟢':'✓'):'·'}</th>`;
+  }).join('');
+
   thead.innerHTML = `
-    <tr>${colKiri}${thHariNum}${colStat}</tr>
+    <tr>${colKiri}${thHari}${colStat}</tr>
     <tr>${thNamaHari}</tr>`;
 
-  const jmlSesi = kalData.filter(k=>k.ada_sesi).length;
+  const jmlSesi = semuaTglKey.length;
   renderRekapRows();
   judul.textContent = bulanLabel + ' (Hijriah)';
   judul.style.display='block';
-  sub.textContent = jmlSesi + ' sesi · ' + rekapData.length + ' guru';
+  sub.textContent = jmlSesi + ' hari sesi · ' + rekapData.length + ' guru';
   if(jmlSesi===0) sub.textContent += ' · Belum ada sesi di bulan ini';
   btnExp.style.display='inline-flex';
 }
@@ -1112,32 +1574,40 @@ function renderRekapRows(filter=''){
     const q=filter.toLowerCase();
     rows=rows.filter(([,r])=>r.nama.toLowerCase().includes(q)||String(r.idpps).includes(q));
   }
+  const totalCols = 5 + 30 + 5;
   if(!rows.length){
-    tbody.innerHTML='<tr><td colspan="'+(5+rekapHariArr.length+5)+'"><div class="empty"><div class="ic">🔍</div><p>Tidak ada guru yang sesuai pencarian</p></div></td></tr>';
+    tbody.innerHTML=`<tr><td colspan="${totalCols}"><div class="empty"><div class="ic">🔍</div><p>Tidak ada guru yang sesuai pencarian</p></div></td></tr>`;
     return;
   }
+
+  // Hanya hitung statistik dari sesi yang sudah DITUTUP
+  const semuaSesiKeys = rekapHariArr.filter(k=>k.adaSesi && !k.masihAktif).map(k=>k.tglKey);
+
   tbody.innerHTML = rows.map(([idpps,r],i)=>{
     const kalCells = rekapHariArr.map(k=>{
-      if(!k.ada_sesi){
-        // Belum ada sesi — tampilkan sel abu-abu tidak bisa diklik
-        return `<td style="text-align:center;padding:6px 4px"><span class="rk-cell kosong" title="${k.hijri_label}: tidak ada sesi" style="cursor:default">·</span></td>`;
+      if(!k.adaSesi){
+        return `<td class="rk-td-jam kosong" title="${k.hijri_label}: tidak ada sesi">·</td>`;
       }
-      const st = r.tgl[k.tanggal_key];
+      const st = r.tgl[k.tglKey];
+      // Sesi masih aktif & belum ada data → tampilkan "?"
+      if(!st && k.masihAktif){
+        return `<td class="rk-td-jam" style="background:#fff8e1;color:#f57f17" title="${k.hijri_label}: sesi sedang berlangsung">?</td>`;
+      }
       const ic={H:'✓',A:'✗',I:'I',S:'S'}[st]||'·';
-      return `<td style="text-align:center;padding:6px 4px">
-        <span class="rk-cell ${st||'kosong'}" title="${k.hijri_label}: ${st||'—'}" style="cursor:pointer" onclick="editRekapStatus('${r.idpps}','${k.tanggal_key}','${st||'A'}',this)">${ic}</span>
-      </td>`;
+      const cls={H:'H',A:'A',I:'I',S:'S'}[st]||'kosong';
+      return `<td class="rk-td-jam ${cls}" title="${k.hijri_label}: ${st||'—'}" style="cursor:pointer" onclick="editRekapStatus('${r.idpps}','${k.tglKey}','${st||'A'}',this)">${ic}</td>`;
     }).join('');
-    // Hitung hanya dari kolom yang ada sesi
-    const sesiKeys = rekapHariArr.filter(k=>k.ada_sesi).map(k=>k.tanggal_key);
-    const H=sesiKeys.filter(k=>r.tgl[k]==='H').length;
-    const A=sesiKeys.filter(k=>r.tgl[k]==='A').length;
-    const I=sesiKeys.filter(k=>r.tgl[k]==='I').length;
-    const S=sesiKeys.filter(k=>r.tgl[k]==='S').length;
+
+    // Statistik
+    const H=semuaSesiKeys.filter(k=>r.tgl[k]==='H').length;
+    const A=semuaSesiKeys.filter(k=>r.tgl[k]==='A').length;
+    const I=semuaSesiKeys.filter(k=>r.tgl[k]==='I').length;
+    const S=semuaSesiKeys.filter(k=>r.tgl[k]==='S').length;
     const tot=H+A+I+S;
     const pct=tot>0?Math.round(H/tot*100):0;
     const pc=pct>=80?'#2e7d32':pct>=60?'#f57f17':'#c62828';
     const barW=Math.max(3,Math.round(pct*40/100));
+
     return `<tr>
       <td class="rk-td center">${i+1}</td>
       <td class="rk-td code">${r.idpps}</td>
@@ -1188,18 +1658,22 @@ function editRekapStatus(idpps, tanggalKey, status, el) {
     const newStatus = sel.value;
     sel.remove();
     if(!window.sb){ toast('Supabase belum siap','err'); return; }
-    // Cek apakah sudah ada absensi
+    // Cari hijri_label dari rekapHariArr
+    let hijriLabelVal = '';
+    rekapHariArr.forEach(k=>{
+      if(k.tglKey===tanggalKey){
+        hijriLabelVal = k.hijri_label;
+      }
+    });
     const {data:exist} = await sb.from('absensi').select('id').eq('id_pps',idpps).eq('tanggal',tanggalKey).maybeSingle();
     if(exist){
       const {error} = await sb.from('absensi').update({status:newStatus}).eq('id',exist.id);
       if(error) toast('Gagal update: '+error.message,'err');
       else toast('Berhasil diupdate!','suc');
     }else{
-      // Ambil hijri_label dari rekapHariArr
-      const hari = rekapHariArr.find(k=>k.tanggal_key===tanggalKey);
       const {error} = await sb.from('absensi').insert({
         id_pps:idpps, tanggal:tanggalKey, status:newStatus,
-        hijri_label: hari ? hari.hijri_label : '',
+        hijri_label: hijriLabelVal,
         keterangan:'Edit manual rekap'
       });
       if(error) toast('Gagal tambah: '+error.message,'err');
@@ -1221,23 +1695,25 @@ function exportRekapExcel(){
   const hTahun = parseInt(document.getElementById('f-tahun-hijri').value);
   const namaFile = 'Rekap_' + BLN_H[hBulan] + '_' + hTahun + 'H.xlsx';
 
-  const headers = ['No','ID PPS','Nama Guru','Dom','Tingkatan',
-    ...rekapHariArr.map(k=> k.ada_sesi ? String(k.hijri_day) : k.hijri_day+'*'),
+  // Header: 1 kolom per hari
+  const hdr = ['No','ID PPS','Nama Guru','Dom','Tingkatan',
+    ...rekapHariArr.map(k=>String(k.hijri_day)),
     'H','A','I','S','%'];
 
-  const rows = rekapData.map(([idpps,r],i)=>{
-    const sesiKeys = rekapHariArr.filter(k=>k.ada_sesi).map(k=>k.tanggal_key);
-    const H=sesiKeys.filter(k=>r.tgl[k]==='H').length;
-    const A=sesiKeys.filter(k=>r.tgl[k]==='A').length;
-    const I=sesiKeys.filter(k=>r.tgl[k]==='I').length;
-    const S=sesiKeys.filter(k=>r.tgl[k]==='S').length;
+  const semuaSesiKeys = rekapHariArr.filter(k=>k.adaSesi).map(k=>k.tglKey);
+
+  const rows = rekapData.map(([,r],i)=>{
+    const H=semuaSesiKeys.filter(k=>r.tgl[k]==='H').length;
+    const A=semuaSesiKeys.filter(k=>r.tgl[k]==='A').length;
+    const I=semuaSesiKeys.filter(k=>r.tgl[k]==='I').length;
+    const S=semuaSesiKeys.filter(k=>r.tgl[k]==='S').length;
     const tot=H+A+I+S;
     const pct=tot>0?Math.round(H/tot*100):0;
-    const kalVals=rekapHariArr.map(k=>k.ada_sesi ? (r.tgl[k.tanggal_key]||'A') : '');
-    return [i+1,r.idpps,r.nama,r.dom,r.tingkatan,...kalVals,H,A,I,S,pct+'%'];
+    const dayVals = rekapHariArr.map(k=> k.adaSesi ? (r.tgl[k.tglKey]||'A') : '');
+    return [i+1,r.idpps,r.nama,r.dom,r.tingkatan,...dayVals,H,A,I,S,pct+'%'];
   });
 
-  const ws = XLSX.utils.aoa_to_sheet([headers,...rows]);
+  const ws = XLSX.utils.aoa_to_sheet([hdr,...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, BLN_H[hBulan]+' '+hTahun);
   XLSX.writeFile(wb, namaFile);
@@ -1304,7 +1780,297 @@ async function importGuru(){
   finally{ btn.disabled=false; btn.innerHTML='⬆️ Import ke Supabase'; }
 }
 
-// ===== TOAST =====
+// ===== ANALISA GURU — berbasis kecepatan check-in =====
+let analisaRawData = {};
+let analisaResult  = [];
+
+// Hitung selisih menit antara 2 ISO timestamp
+function selisihMenit(tsDibuka, tsCheckin) {
+  if(!tsDibuka || !tsCheckin) return null;
+  const diff = (new Date(tsCheckin) - new Date(tsDibuka)) / 60000;
+  return diff < 0 ? null : Math.round(diff); // abaikan jika checkin sebelum sesi dibuka (data korup)
+}
+
+function fmtMenit(m) {
+  if(m === null) return '—';
+  if(m < 60) return m + ' mnt';
+  return Math.floor(m/60) + 'j ' + (m%60) + 'mnt';
+}
+
+function getKategoriKecepatan(avgMenit) {
+  if(avgMenit === null) return {label:'📵 Tanpa Data', cls:'pola-abu', score:0};
+  if(avgMenit <  5)    return {label:'⚡ Sangat Cepat', cls:'pola-hijau', score:4};
+  if(avgMenit < 15)    return {label:'✅ Tepat Waktu',  cls:'pola-biru',  score:3};
+  if(avgMenit < 30)    return {label:'⏰ Agak Lambat',  cls:'pola-kuning',score:2};
+  return                      {label:'🐢 Sering Telat', cls:'pola-merah', score:1};
+}
+
+async function loadAnalisa(){
+  if(!sb){ toast('Hubungkan Supabase dulu!','err'); return; }
+  const hBulan = parseInt(document.getElementById('an-bulan').value);
+  const hTahun = parseInt(document.getElementById('an-tahun').value);
+
+  document.getElementById('an-summary').style.display='none';
+  document.getElementById('an-empty').style.display='none';
+  document.getElementById('btn-export-analisa').style.display='none';
+
+  const tbody = document.getElementById('tbody-analisa');
+  tbody.innerHTML=`<tr><td colspan="14"><div class="rekap-loading"><div class="spin"></div><p>Menganalisa data...</p></div></td></tr>`;
+
+  try {
+    // 1. Ambil semua sesi bulan ini — termasuk dibuka_jam
+    const {data:sesiList, error:sesiErr} = await sb
+      .from('sesi_absensi')
+      .select('tanggal_key, hijri_day, dibuka_jam, created_at')
+      .eq('hijri_month', hBulan)
+      .eq('hijri_year', hTahun)
+      .order('tanggal_key');
+    if(sesiErr) throw sesiErr;
+    if(!sesiList || sesiList.length===0){
+      tbody.innerHTML=`<tr><td colspan="14"><div class="empty"><div class="ic">📭</div><p>Belum ada sesi di bulan ini</p></div></td></tr>`;
+      document.getElementById('an-empty').style.display='block';
+      document.getElementById('an-empty').innerHTML=`<div style="font-size:36px;margin-bottom:10px">📭</div><div style="font-size:14px;font-weight:700;color:var(--hijau-tua)">Tidak ada sesi di bulan ini</div><div style="font-size:12.5px;color:var(--abu);margin-top:5px">Pastikan sesi sudah dibuka dan ada absensi di bulan yang dipilih.</div>`;
+      return;
+    }
+
+    // Peta tanggal_key → sesi (untuk ambil dibuka_jam)
+    const sesiMap = {};
+    sesiList.forEach(s=>{
+      // Gunakan dibuka_jam jika ada, fallback ke created_at
+      sesiMap[s.tanggal_key] = s.dibuka_jam || s.created_at || null;
+    });
+
+    const semuaTglKey = sesiList.map(s=>s.tanggal_key);
+    const totalSesi   = semuaTglKey.length;
+    const adaDibukaJam = sesiList.some(s=>s.dibuka_jam); // apakah kolom sudah ada
+
+    // 2. Ambil semua absensi bulan ini — penting: butuh created_at
+    const {data:absensiList, error:abErr} = await sb
+      .from('absensi')
+      .select('id_pps, tanggal, status, keterangan, created_at')
+      .in('tanggal', semuaTglKey);
+    if(abErr) throw abErr;
+
+    // 3. Grup absensi per guru, per tanggal
+    const guruMap = {};
+    daftarGuru.forEach(g=>{ guruMap[g.id_pps] = {}; });
+    (absensiList||[]).forEach(a=>{
+      if(!guruMap[a.id_pps]) return;
+      guruMap[a.id_pps][a.tanggal] = a;
+    });
+
+    // 4. Hitung statistik per guru
+    analisaResult = daftarGuru.map(g=>{
+      const rows = guruMap[g.id_pps] || {};
+      let H=0, A=0, I=0, S=0;
+      let selisihList = []; // menit check-in setelah sesi dibuka, hanya yang Hadir
+
+      semuaTglKey.forEach(tgl=>{
+        const rec      = rows[tgl];
+        const tsDibuka = sesiMap[tgl]; // kapan sesi dibuka
+
+        if(rec){
+          if(rec.status==='H'){
+            H++;
+            // Hitung selisih menit
+            const mnt = selisihMenit(tsDibuka, rec.created_at);
+            if(mnt !== null) selisihList.push(mnt);
+          }
+          else if(rec.status==='I') I++;
+          else if(rec.status==='S') S++;
+          else A++;
+        } else {
+          A++; // tidak ada record = Alpha
+        }
+      });
+
+      const tot = H+A+I+S;
+      const pct = tot>0 ? Math.round(H/tot*100) : 0;
+
+      // Statistik kecepatan
+      const avgMenit  = selisihList.length>0 ? Math.round(selisihList.reduce((a,b)=>a+b,0)/selisihList.length) : null;
+      const minMenit  = selisihList.length>0 ? Math.min(...selisihList) : null;
+      const maxMenit  = selisihList.length>0 ? Math.max(...selisihList) : null;
+      const kategori  = getKategoriKecepatan(avgMenit);
+
+      return {g, H, A, I, S, tot, pct, avgMenit, minMenit, maxMenit, kategori, selisihList};
+    });
+
+    // 5. Simpan untuk export
+    analisaRawData = {hBulan, hTahun, totalSesi, adaDibukaJam};
+
+    // 6. Render
+    renderAnalisaSummary();
+    renderAnalisaTable();
+
+    document.getElementById('an-summary').style.display='block';
+    document.getElementById('an-tbl-sub').textContent =
+      `${daftarGuru.length} guru · ${totalSesi} sesi · ${BLN_H[hBulan]} ${hTahun}H` +
+      (!adaDibukaJam ? ' · ⚠️ Kolom dibuka_jam belum ada — jalankan SQL migrasi dulu' : '');
+    document.getElementById('btn-export-analisa').style.display='inline-flex';
+    toast('✅ Analisa selesai!','suc');
+
+  } catch(e){
+    toast('❌ Error: '+e.message,'err');
+    tbody.innerHTML=`<tr><td colspan="14"><div class="empty"><div class="ic">⚠️</div><p>${e.message}</p></div></td></tr>`;
+    console.error(e);
+  }
+}
+
+function renderAnalisaSummary(){
+  // Paling rajin = % hadir tertinggi
+  const sorted = [...analisaResult].sort((a,b)=>b.pct-a.pct);
+  const top = sorted[0];
+  const bot = sorted[sorted.length-1];
+
+  // Paling telat = rata-rata menit tertinggi (yang punya data)
+  const punyaData = analisaResult.filter(r=>r.avgMenit!==null);
+  const telatGuru = analisaResult.filter(r=>r.kategori.cls==='pola-merah').length;
+  const avgGlobal = punyaData.length>0 ? Math.round(punyaData.reduce((s,r)=>s+r.avgMenit,0)/punyaData.length) : null;
+  const avgPct    = analisaResult.length>0 ? Math.round(analisaResult.reduce((s,r)=>s+r.pct,0)/analisaResult.length) : 0;
+
+  document.getElementById('an-top-nama').textContent = top ? top.g.nama : '—';
+  document.getElementById('an-top-pct').textContent  = top ? top.pct+'% hadir · '+top.H+' sesi hadir' : '—';
+  document.getElementById('an-bot-nama').textContent = bot ? bot.g.nama : '—';
+  document.getElementById('an-bot-pct').textContent  = bot ? bot.pct+'% hadir · '+bot.A+' alpha' : '—';
+  document.getElementById('an-telat-jml').textContent = telatGuru;
+  document.getElementById('an-avg-pct').textContent  = avgPct+'%';
+
+  // Bar chart distribusi KECEPATAN check-in
+  const bands = [
+    {label:'< 5 mnt',   min:0,  max:4,   color:'#2e7d32', desc:'Sangat Cepat'},
+    {label:'5–14 mnt',  min:5,  max:14,  color:'#43a047', desc:'Tepat Waktu'},
+    {label:'15–29 mnt', min:15, max:29,  color:'#ffa726', desc:'Agak Lambat'},
+    {label:'30–59 mnt', min:30, max:59,  color:'#ef6c00', desc:'Lambat'},
+    {label:'≥ 60 mnt',  min:60, max:9999,color:'#c62828', desc:'Sering Telat'},
+  ];
+  const punyaAvg = analisaResult.filter(r=>r.avgMenit!==null);
+  const maxCount = Math.max(...bands.map(b=>punyaAvg.filter(r=>r.avgMenit>=b.min&&r.avgMenit<=b.max).length),1);
+
+  document.getElementById('an-chart-bars').innerHTML =
+    `<div style="font-size:11.5px;color:var(--abu);margin-bottom:8px">⏱ Distribusi rata-rata kecepatan check-in per guru · rata-rata global: <strong>${fmtMenit(avgGlobal)}</strong> setelah sesi dibuka</div>` +
+    bands.map(b=>{
+      const count = punyaAvg.filter(r=>r.avgMenit>=b.min&&r.avgMenit<=b.max).length;
+      const pct   = Math.round(count/maxCount*100);
+      const names = punyaAvg.filter(r=>r.avgMenit>=b.min&&r.avgMenit<=b.max).map(r=>r.g.nama).join(', ');
+      return `<div style="display:flex;align-items:center;gap:10px;font-size:12px" title="${names||'Tidak ada'}">
+        <div style="width:76px;text-align:right;color:var(--abu);flex-shrink:0;font-size:11px">${b.label}</div>
+        <div style="flex:1;background:#f0ebe0;border-radius:4px;height:22px;overflow:hidden">
+          <div style="width:${pct}%;background:${b.color};height:100%;border-radius:4px;transition:width .4s;display:flex;align-items:center;padding-left:8px">
+            ${count>0?`<span style="color:#fff;font-size:10.5px;font-weight:700">${count} guru</span>`:''}
+          </div>
+        </div>
+        <div style="width:40px;font-weight:700;color:${b.color}">${count}</div>
+      </div>`;
+    }).join('') +
+    (analisaResult.filter(r=>r.avgMenit===null).length>0
+      ? `<div style="font-size:11px;color:var(--abu);margin-top:8px">📵 ${analisaResult.filter(r=>r.avgMenit===null).length} guru tidak punya data kecepatan (sesi lama atau belum pernah hadir)</div>`
+      : '');
+}
+
+function renderAnalisaTable(){
+  const sort = document.getElementById('an-sort').value;
+  const q    = (document.getElementById('an-cari').value||'').toLowerCase();
+  let data   = analisaResult.filter(r=>!q || r.g.nama.toLowerCase().includes(q) || (r.g.dom||'').toLowerCase().includes(q));
+
+  if(sort==='pct-desc')     data.sort((a,b)=>b.pct-a.pct);
+  else if(sort==='pct-asc') data.sort((a,b)=>a.pct-b.pct);
+  else if(sort==='telat-desc') data.sort((a,b)=>{
+    // Urutkan: yang punya data dulu, terbesar avg menit paling atas
+    if(a.avgMenit===null && b.avgMenit===null) return 0;
+    if(a.avgMenit===null) return 1;
+    if(b.avgMenit===null) return -1;
+    return b.avgMenit - a.avgMenit;
+  });
+  else if(sort==='cepat-asc') data.sort((a,b)=>{
+    // Tercepat di atas
+    if(a.avgMenit===null && b.avgMenit===null) return 0;
+    if(a.avgMenit===null) return 1;
+    if(b.avgMenit===null) return -1;
+    return a.avgMenit - b.avgMenit;
+  });
+  else if(sort==='alpha-desc') data.sort((a,b)=>b.A-a.A);
+  else if(sort==='nama') data.sort((a,b)=>a.g.nama.localeCompare(b.g.nama));
+
+  const polaStyle = {
+    'pola-hijau': 'background:#e8f5e9;color:#2e7d32',
+    'pola-biru':  'background:#e3f2fd;color:#1565c0',
+    'pola-kuning':'background:#fff8e1;color:#e65100',
+    'pola-merah': 'background:#fce4ec;color:#c62828',
+    'pola-abu':   'background:#f5f5f5;color:#9e9e9e',
+  };
+
+  document.getElementById('tbody-analisa').innerHTML = data.map((r,i)=>{
+    const barW     = r.pct;
+    const barColor = r.pct>=80?'#43a047':r.pct>=60?'#ffa726':'#ef5350';
+
+    // Warna avg menit
+    const avgColor = r.avgMenit===null?'#ccc': r.avgMenit<5?'#2e7d32':r.avgMenit<15?'#1565c0':r.avgMenit<30?'#e65100':'#c62828';
+
+    // Catatan otomatis
+    let catatan = '';
+    if(r.kategori.cls==='pola-merah')  catatan = '🐢 Rata-rata check-in >30 mnt setelah sesi dibuka';
+    else if(r.kategori.cls==='pola-kuning') catatan = '⏰ Perlu lebih cepat check-in';
+    else if(r.kategori.cls==='pola-hijau')  catatan = '🌟 Sangat disiplin & tepat waktu';
+    else if(r.kategori.cls==='pola-biru')   catatan = '👍 Check-in tepat waktu';
+    else if(r.H===0) catatan = '🔴 Tidak pernah hadir bulan ini';
+
+    return `<tr>
+      <td style="font-size:12px;color:var(--abu)">${i+1}</td>
+      <td style="font-weight:700;font-size:13px">${r.g.nama}</td>
+      <td style="font-size:12.5px;color:var(--abu)">${r.g.dom||'—'}</td>
+      <td style="font-size:12px">${r.g.tingkatan||'—'}</td>
+      <td style="text-align:center"><span style="font-weight:700;color:#2e7d32">${r.H}</span></td>
+      <td style="text-align:center"><span style="font-weight:700;color:#c62828">${r.A}</span></td>
+      <td style="text-align:center"><span style="font-weight:700;color:#f57f17">${r.I}</span></td>
+      <td style="text-align:center"><span style="font-weight:700;color:#1565c0">${r.S}</span></td>
+      <td style="text-align:center">
+        <div style="display:flex;align-items:center;gap:5px;justify-content:center">
+          <div style="width:42px;background:#f0ebe0;border-radius:3px;height:8px;overflow:hidden;flex-shrink:0">
+            <div style="width:${barW}%;background:${barColor};height:100%;border-radius:3px"></div>
+          </div>
+          <span style="font-weight:700;color:${barColor};font-size:12.5px">${r.pct}%</span>
+        </div>
+      </td>
+      <td style="text-align:center;font-weight:700;color:${avgColor};font-size:13px">${fmtMenit(r.avgMenit)}</td>
+      <td style="text-align:center;font-size:12px;color:#2e7d32">${fmtMenit(r.minMenit)}</td>
+      <td style="text-align:center;font-size:12px;color:#c62828">${fmtMenit(r.maxMenit)}</td>
+      <td style="text-align:center"><span style="padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:700;${polaStyle[r.kategori.cls]}">${r.kategori.label}</span></td>
+      <td style="font-size:11.5px;color:var(--abu)">${catatan}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="14"><div class="empty"><div class="ic">🔍</div><p>Tidak ada guru ditemukan</p></div></td></tr>`;
+}
+
+function exportAnalisaExcel(){
+  if(!analisaResult.length){ toast('Belum ada data analisa!','err'); return; }
+  const {hBulan, hTahun} = analisaRawData;
+  const header = ['No','ID PPS','Nama','Dom','Tingkatan','H','A','I','S','% Hadir','Rata2 Check-in','Tercepat','Terlambat','Kategori','Catatan'];
+  const rows = analisaResult.map((r,i)=>{
+    let catatan = '';
+    if(r.kategori.cls==='pola-merah')  catatan='Rata-rata check-in >30 mnt';
+    else if(r.kategori.cls==='pola-kuning') catatan='Perlu lebih cepat check-in';
+    else if(r.kategori.cls==='pola-hijau')  catatan='Sangat disiplin & tepat waktu';
+    else if(r.kategori.cls==='pola-biru')   catatan='Check-in tepat waktu';
+    else if(r.H===0) catatan='Tidak pernah hadir bulan ini';
+    return [
+      i+1, r.g.id_pps, r.g.nama, r.g.dom||'', r.g.tingkatan||'',
+      r.H, r.A, r.I, r.S, r.pct+'%',
+      r.avgMenit!==null ? r.avgMenit+' mnt' : '—',
+      r.minMenit!==null ? r.minMenit+' mnt' : '—',
+      r.maxMenit!==null ? r.maxMenit+' mnt' : '—',
+      r.kategori.label.replace(/[^\w\s%]/g,'').trim(),
+      catatan
+    ];
+  });
+  const ws = XLSX.utils.aoa_to_sheet([header,...rows]);
+  ws['!cols'] = [4,10,22,8,12,5,5,5,5,9,13,10,11,14,28].map(w=>({wch:w}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Analisa '+BLN_H[hBulan]+' '+hTahun);
+  XLSX.writeFile(wb, 'Analisa_Guru_'+BLN_H[hBulan]+'_'+hTahun+'H.xlsx');
+  toast('✅ Export berhasil!','suc');
+}
+
+
 function toast(msg,type=''){
   const t=document.getElementById('toast');
   t.textContent=msg; t.className='toast show '+(type||'');
