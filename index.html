@@ -85,6 +85,70 @@ tr:hover td{background:#fdf8f0}
 .empty .ic{font-size:32px;margin-bottom:8px}
 .empty p{font-size:12.5px}
 
+/* =============================================
+   DASHBOARD — REDESIGN
+   ============================================= */
+/* Stat cards baru */
+.dsh-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 13px; margin-bottom: 18px; }
+.dsh-card { background:#fff; border-radius:14px; padding:16px 18px; border:1px solid var(--border); position:relative; overflow:hidden; display:flex; flex-direction:column; gap:5px; }
+.dsh-card::after { content:''; position:absolute; bottom:-18px; right:-18px; width:72px; height:72px; border-radius:50%; opacity:.07; }
+.dsh-card.green::before  { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:var(--hijau); }
+.dsh-card.green::after   { background:var(--hijau); }
+.dsh-card.red::before    { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:#e53935; }
+.dsh-card.red::after     { background:#e53935; }
+.dsh-card.gold::before   { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:var(--emas); }
+.dsh-card.gold::after    { background:var(--emas); }
+.dsh-card.blue::before   { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:#1565c0; }
+.dsh-card.blue::after    { background:#1565c0; }
+.dsh-card.orange::before { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:#e65100; }
+.dsh-card.orange::after  { background:#e65100; }
+.dsh-card.purple::before { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:#6a1b9a; }
+.dsh-card.purple::after  { background:#6a1b9a; }
+.dsh-ic   { font-size:18px; margin-bottom:2px; }
+.dsh-lb   { font-size:9.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--abu); }
+.dsh-val  { font-size:26px; font-weight:700; color:var(--hijau-tua); line-height:1.1; }
+.dsh-sub  { font-size:10.5px; color:var(--abu); }
+/* Progress ring */
+.dsh-ring-wrap { display:flex; align-items:center; justify-content:center; margin:8px 0 4px; }
+.dsh-ring-val  { font-size:18px; font-weight:700; fill:var(--hijau-tua); }
+/* Baris dashboard 2 kolom */
+.dsh-row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+.dsh-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:18px; }
+/* Mini bar chart */
+.dsh-bar-row { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid #f5f0e8; }
+.dsh-bar-row:last-child { border-bottom:none; }
+.dsh-bar-nm  { font-size:12px; font-weight:600; color:var(--hijau-tua); min-width:100px; max-width:130px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dsh-bar-bg  { flex:1; height:8px; background:#f0ebe0; border-radius:4px; overflow:hidden; }
+.dsh-bar-fill{ height:100%; border-radius:4px; transition:width .4s; }
+.dsh-bar-pct { font-size:11.5px; font-weight:700; min-width:36px; text-align:right; }
+/* Dom breakdown */
+.dsh-dom-row { display:flex; align-items:center; justify-content:space-between; padding:7px 0; border-bottom:1px solid #f5f0e8; font-size:12.5px; }
+.dsh-dom-row:last-child { border-bottom:none; }
+/* Status pill list */
+.dsh-status-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.dsh-status-pill { background:var(--krem); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; align-items:center; gap:3px; }
+.dsh-status-pill .val { font-size:22px; font-weight:700; }
+.dsh-status-pill .lbl { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--abu); }
+/* Sesi info strip */
+.dsh-sesi-strip { background:linear-gradient(135deg,var(--hijau-tua),var(--hijau)); border-radius:12px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; color:#fff; flex-wrap:wrap; gap:10px; }
+.dsh-sesi-strip .info { display:flex; flex-direction:column; gap:2px; }
+.dsh-sesi-strip .tgl  { font-family:'Amiri',serif; font-size:16px; }
+.dsh-sesi-strip .sub  { font-size:11px; opacity:.75; }
+.dsh-sesi-strip .badge-aktif { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:20px; padding:4px 12px; font-size:11px; font-weight:700; }
+/* Tren mini line */
+.dsh-tren-wrap { display:flex; align-items:flex-end; gap:4px; height:50px; padding:0 4px; }
+.dsh-tren-bar  { flex:1; border-radius:3px 3px 0 0; min-height:4px; transition:height .3s; position:relative; cursor:default; }
+.dsh-tren-bar:hover::after { content:attr(data-tip); position:absolute; bottom:calc(100%+4px); left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:3px 8px; border-radius:6px; font-size:10px; white-space:nowrap; z-index:9; }
+/* Absensi progress ring */
+.ring-svg { transform:rotate(-90deg); }
+.ring-track { fill:none; stroke:#f0ebe0; }
+.ring-fill  { fill:none; stroke-linecap:round; transition:stroke-dashoffset .6s; }
+/* Responsive */
+@media(max-width:768px){
+  .dsh-row2,.dsh-row3 { grid-template-columns:1fr; }
+  .dsh-grid { grid-template-columns:repeat(2,1fr); }
+}
+
 /* STATS */
 .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:13px;margin-bottom:20px}
 .sc{background:#fff;border-radius:12px;padding:16px;border:1px solid var(--border);position:relative;overflow:hidden}
@@ -273,6 +337,68 @@ tr:hover td{background:#fdf8f0}
 .refresh-info{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--abu);font-weight:500}
 .refresh-dot{width:6px;height:6px;border-radius:50%;background:var(--hijau-terang);animation:pulse 2s infinite}
 
+/* =============================================
+   SETTINGS MODAL
+   ============================================= */
+.stt-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center}
+.stt-overlay.show{display:flex}
+.stt-modal{background:var(--krem);border-radius:16px;width:92%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.stt-header{background:var(--hijau-tua);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.stt-header-title{color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:9px}
+.stt-close{background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.stt-close:hover{background:rgba(255,255,255,.22)}
+.stt-body{display:flex;flex:1;overflow:hidden}
+.stt-nav{width:180px;background:#fff;border-right:1px solid var(--border);padding:10px 8px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;overflow-y:auto}
+.stt-ni{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:500;color:var(--abu);border:none;background:none;width:100%;text-align:left;transition:all .15s}
+.stt-ni:hover{background:var(--krem);color:var(--hijau-tua)}
+.stt-ni.on{background:rgba(45,106,79,.1);color:var(--hijau);font-weight:700}
+.stt-ni .ic{font-size:15px;min-width:18px}
+.stt-content{flex:1;overflow-y:auto;padding:22px}
+.stt-section{display:none}.stt-section.active{display:block}
+.stt-sec-title{font-size:14px;font-weight:700;color:var(--hijau-tua);margin-bottom:4px}
+.stt-sec-sub{font-size:12px;color:var(--abu);margin-bottom:18px}
+.stt-group{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.stt-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #f5f0e8;gap:12px;flex-wrap:wrap}
+.stt-row:last-child{border-bottom:none}
+.stt-row-label{font-size:13px;font-weight:600;color:var(--hijau-tua)}
+.stt-row-desc{font-size:11.5px;color:var(--abu);margin-top:2px}
+.stt-inp{border:1.5px solid #ddd;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit;background:#fff;width:100%;transition:border-color .15s}
+.stt-inp:focus{border-color:var(--hijau-muda)}
+.stt-inp-wrap{flex:1;min-width:180px}
+.stt-btn-save{background:var(--hijau);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.stt-btn-save:hover{background:var(--hijau-muda)}
+/* Toggle switch */
+.stt-toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.stt-toggle input{opacity:0;width:0;height:0;position:absolute}
+.stt-toggle-track{position:absolute;inset:0;background:#ccc;border-radius:11px;cursor:pointer;transition:background .2s}
+.stt-toggle input:checked+.stt-toggle-track{background:var(--hijau)}
+.stt-toggle-track::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s}
+.stt-toggle input:checked+.stt-toggle-track::after{transform:translateX(18px)}
+/* Color swatches tema */
+.stt-swatches{display:flex;gap:8px;flex-wrap:wrap}
+.stt-swatch{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.stt-swatch.on,.stt-swatch:hover{border-color:var(--hijau-tua);transform:scale(1.12)}
+/* Koneksi status */
+.stt-conn-status{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.stt-conn-status.ok{background:#e8f5e9;color:#2e7d32}
+.stt-conn-status.no{background:#fce4ec;color:#c62828}
+.stt-conn-status.testing{background:#fff8e1;color:#e65100}
+/* Range slider label */
+.stt-range-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:160px}
+.stt-range-val{font-size:13px;font-weight:700;color:var(--hijau-tua);min-width:45px;text-align:right}
+/* Dark mode */
+body.dark-mode{--krem:#1a1a2e;--putih:#16213e;--border:#2a2a4a;--abu:#8a8aaa}
+body.dark-mode .sb{background:#0f0f1a}
+body.dark-mode .main,.body.dark-mode .topbar{background:#1a1a2e}
+body.dark-mode .card,.body.dark-mode .sc,.body.dark-mode .ss,.body.dark-mode .log-card{background:#16213e;border-color:#2a2a4a}
+body.dark-mode th{background:#1a1a2e}
+body.dark-mode td{border-color:#2a2a4a}
+body.dark-mode .topbar{background:#16213e;border-color:#2a2a4a}
+body.dark-mode .stt-modal,.body.dark-mode .stt-group{background:#16213e}
+body.dark-mode .stt-nav{background:#1a1a2e;border-color:#2a2a4a}
+body.dark-mode .stt-inp{background:#1a1a2e;border-color:#2a2a4a;color:#e0e0ff}
+body.dark-mode .stt-row{border-color:#2a2a4a}
+
 /* UTIL */
 .loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -374,6 +500,7 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
     <button class="ni" onclick="go('guru',this)"><span class="ic">👤</span>Data Guru</button>
     <button class="ni" onclick="go('upload',this)"><span class="ic">📤</span>Upload Excel</button>
     <button class="ni" onclick="go('analisa',this)"><span class="ic">🔬</span>Analisa Guru</button>
+    <button class="ni" onclick="bukaSettings()" style="margin-top:auto"><span class="ic">⚙️</span>Pengaturan</button>
   </nav>
   <div class="sb-ft">Madrasah Tarbiyah Idadiyah<br>al-Miftah · v5.0</div>
 </div>
@@ -399,30 +526,196 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
-      <div class="sg">
-        <div class="sc h"><div class="sc-ic">✅</div><div class="sc-lb">Hadir Hari Ini</div><div class="sc-val" id="s-hadir">—</div><div class="sc-desc">Sudah check-in</div></div>
-        <!-- FIX: Alpha sekarang = total guru - yang hadir -->
-        <div class="sc a"><div class="sc-ic">❌</div><div class="sc-lb">Belum Hadir</div><div class="sc-val" id="s-alpha">—</div><div class="sc-desc">Belum check-in</div></div>
-        <div class="sc t"><div class="sc-ic">👥</div><div class="sc-lb">Total Guru</div><div class="sc-val" id="s-total">—</div><div class="sc-desc">Terdaftar</div></div>
-        <div class="sc p"><div class="sc-ic">📈</div><div class="sc-lb">% Hadir Bulan Ini</div><div class="sc-val" id="s-persen">—</div><div class="sc-desc">Rata-rata</div></div>
+
+      <!-- Strip Info Sesi Aktif -->
+      <div class="dsh-sesi-strip" id="dsh-sesi-strip">
+        <div class="info">
+          <div class="tgl" id="dsh-sesi-tgl">Belum ada sesi aktif</div>
+          <div class="sub" id="dsh-sesi-sub">—</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="badge-aktif" id="dsh-sesi-badge">⚫ Tidak Ada Sesi</span>
+          <span class="refresh-info" id="dash-refresh-info" style="font-size:11px;color:rgba(255,255,255,.7);display:none">
+            <span class="refresh-dot"></span> refresh <span id="dash-countdown">—</span>s
+          </span>
+          <button class="btn" onclick="loadDashboard()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);font-size:12px;padding:5px 12px">🔄</button>
+        </div>
       </div>
-      <div class="card">
-        <div class="ch">
-          <div><div class="ct">📋 Absensi Terkini</div><div class="cs">10 input terakhir</div></div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="refresh-info" id="dash-refresh-info" style="display:none;font-size:11px;color:var(--abu)">
-              <span class="refresh-dot"></span> auto-refresh <span id="dash-countdown">—</span>s
-            </span>
-            <button class="btn btn-g" onclick="loadDashboard()">🔄 Refresh</button>
+
+      <!-- Stat cards utama — baris 1 -->
+      <div class="dsh-grid" id="dsh-grid-main">
+        <div class="dsh-card green">
+          <div class="dsh-ic">✅</div>
+          <div class="dsh-lb">Hadir Hari Ini</div>
+          <div class="dsh-val" id="dsh-hadir">—</div>
+          <div class="dsh-sub" id="dsh-hadir-sub">guru check-in</div>
+        </div>
+        <div class="dsh-card red">
+          <div class="dsh-ic">❌</div>
+          <div class="dsh-lb">Belum Hadir</div>
+          <div class="dsh-val" id="dsh-belum">—</div>
+          <div class="dsh-sub" id="dsh-belum-sub">dari total guru</div>
+        </div>
+        <div class="dsh-card gold">
+          <div class="dsh-ic">👥</div>
+          <div class="dsh-lb">Total Guru</div>
+          <div class="dsh-val" id="dsh-total">—</div>
+          <div class="dsh-sub">terdaftar</div>
+        </div>
+        <div class="dsh-card blue">
+          <div class="dsh-ic">📈</div>
+          <div class="dsh-lb">Kehadiran Bulan Ini</div>
+          <div class="dsh-val" id="dsh-pct-bulan">—</div>
+          <div class="dsh-sub" id="dsh-pct-sub">rata-rata</div>
+        </div>
+        <div class="dsh-card orange">
+          <div class="dsh-ic">📅</div>
+          <div class="dsh-lb">Sesi Bulan Ini</div>
+          <div class="dsh-val" id="dsh-jml-sesi">—</div>
+          <div class="dsh-sub">pertemuan tercatat</div>
+        </div>
+        <div class="dsh-card purple">
+          <div class="dsh-ic">🏆</div>
+          <div class="dsh-lb">Kehadiran Terbaik</div>
+          <div class="dsh-val" id="dsh-best-pct">—</div>
+          <div class="dsh-sub" id="dsh-best-nm">—</div>
+        </div>
+      </div>
+
+      <!-- Baris 2: Distribusi status + Tren kehadiran -->
+      <div class="dsh-row2">
+
+        <!-- Distribusi status hari ini -->
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><div><div class="ct">🎯 Distribusi Status Hari Ini</div><div class="cs" id="dsh-dist-sub">Berdasarkan sesi aktif</div></div></div>
+          <div style="padding:16px 18px">
+            <!-- Ring chart -->
+            <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+              <div style="position:relative;width:110px;height:110px;flex-shrink:0">
+                <svg width="110" height="110" class="ring-svg" id="dsh-ring-svg">
+                  <circle class="ring-track" cx="55" cy="55" r="44" stroke-width="11"/>
+                  <circle class="ring-fill" id="ring-H" cx="55" cy="55" r="44" stroke-width="11" stroke="#2e7d32" stroke-dasharray="276" stroke-dashoffset="276"/>
+                  <circle class="ring-fill" id="ring-A" cx="55" cy="55" r="44" stroke-width="11" stroke="#c62828" stroke-dasharray="276" stroke-dashoffset="276"/>
+                  <circle class="ring-fill" id="ring-I" cx="55" cy="55" r="44" stroke-width="11" stroke="#f57f17" stroke-dasharray="276" stroke-dashoffset="276"/>
+                  <circle class="ring-fill" id="ring-S" cx="55" cy="55" r="44" stroke-width="11" stroke="#1565c0" stroke-dasharray="276" stroke-dashoffset="276"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(0deg)">
+                  <div style="font-size:20px;font-weight:700;color:var(--hijau-tua)" id="dsh-ring-pct">—</div>
+                  <div style="font-size:9px;color:var(--abu);font-weight:700;letter-spacing:1px">HADIR</div>
+                </div>
+              </div>
+              <div class="dsh-status-grid" style="flex:1;min-width:140px">
+                <div class="dsh-status-pill">
+                  <span class="val" style="color:#2e7d32" id="dsh-st-H">—</span>
+                  <span class="lbl">Hadir</span>
+                </div>
+                <div class="dsh-status-pill">
+                  <span class="val" style="color:#c62828" id="dsh-st-A">—</span>
+                  <span class="lbl">Alpha</span>
+                </div>
+                <div class="dsh-status-pill">
+                  <span class="val" style="color:#f57f17" id="dsh-st-I">—</span>
+                  <span class="lbl">Izin</span>
+                </div>
+                <div class="dsh-status-pill">
+                  <span class="val" style="color:#1565c0" id="dsh-st-S">—</span>
+                  <span class="lbl">Sakit</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Nama Guru</th><th>Dom</th><th>Tingkatan</th><th>Tanggal</th><th>Status</th><th>Keterangan</th></tr></thead>
-            <tbody id="tb-terkini"><tr><td colspan="6"><div class="empty"><div class="ic">📭</div><p>Belum ada data</p></div></td></tr></tbody>
-          </table>
+
+        <!-- Tren 7 sesi terakhir -->
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><div><div class="ct">📊 Tren 7 Sesi Terakhir</div><div class="cs">% kehadiran per pertemuan</div></div></div>
+          <div style="padding:16px 18px">
+            <div class="dsh-tren-wrap" id="dsh-tren-chart">
+              <div style="color:var(--abu);font-size:12px;text-align:center;width:100%">Memuat...</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px" id="dsh-tren-labels"></div>
+            <div style="margin-top:12px;display:flex;gap:14px;flex-wrap:wrap" id="dsh-tren-legend">
+              <span style="font-size:11px;color:var(--abu)">🟢 ≥80% &nbsp; 🟡 60–79% &nbsp; 🔴 &lt;60%</span>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Baris 3: Top hadir + Top alpha + Breakdown Dom -->
+      <div class="dsh-row3">
+
+        <!-- Top 5 paling rajin bulan ini -->
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><div><div class="ct">🌟 Top 5 Paling Rajin</div><div class="cs">Kehadiran tertinggi bulan ini</div></div></div>
+          <div style="padding:12px 18px" id="dsh-top-rajin">
+            <div style="color:var(--abu);font-size:12px;text-align:center;padding:20px 0">Memuat...</div>
+          </div>
+        </div>
+
+        <!-- Top 5 paling sering alpha -->
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><div><div class="ct">⚠️ Perlu Perhatian</div><div class="cs">Alpha terbanyak bulan ini</div></div></div>
+          <div style="padding:12px 18px" id="dsh-top-alpha">
+            <div style="color:var(--abu);font-size:12px;text-align:center;padding:20px 0">Memuat...</div>
+          </div>
+        </div>
+
+        <!-- Breakdown per Dom -->
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><div><div class="ct">🏷️ Kehadiran per Dom</div><div class="cs">Rata-rata tiap kelompok</div></div></div>
+          <div style="padding:12px 18px" id="dsh-dom-chart">
+            <div style="color:var(--abu);font-size:12px;text-align:center;padding:20px 0">Memuat...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Baris 4: Ringkasan bulan + Sesi hari ini detail -->
+      <div class="dsh-row2" style="margin-bottom:0">
+
+        <!-- Rekap cepat bulan ini: total H/A/I/S -->
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><div><div class="ct">📋 Rekap Cepat Bulan Ini</div><div class="cs" id="dsh-rekap-sub">Total seluruh absensi</div></div></div>
+          <div style="padding:14px 18px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="dsh-rekap-grid">
+              <div style="background:#e8f5e9;border-radius:10px;padding:12px;text-align:center">
+                <div style="font-size:22px;font-weight:700;color:#2e7d32" id="dsh-bln-H">—</div>
+                <div style="font-size:10px;color:#2e7d32;font-weight:700;letter-spacing:1px">HADIR</div>
+              </div>
+              <div style="background:#fce4ec;border-radius:10px;padding:12px;text-align:center">
+                <div style="font-size:22px;font-weight:700;color:#c62828" id="dsh-bln-A">—</div>
+                <div style="font-size:10px;color:#c62828;font-weight:700;letter-spacing:1px">ALPHA</div>
+              </div>
+              <div style="background:#fff8e1;border-radius:10px;padding:12px;text-align:center">
+                <div style="font-size:22px;font-weight:700;color:#f57f17" id="dsh-bln-I">—</div>
+                <div style="font-size:10px;color:#f57f17;font-weight:700;letter-spacing:1px">IZIN</div>
+              </div>
+              <div style="background:#e3f2fd;border-radius:10px;padding:12px;text-align:center">
+                <div style="font-size:22px;font-weight:700;color:#1565c0" id="dsh-bln-S">—</div>
+                <div style="font-size:10px;color:#1565c0;font-weight:700;letter-spacing:1px">SAKIT</div>
+              </div>
+            </div>
+            <!-- Progress bar total kehadiran bulan ini -->
+            <div style="margin-top:14px">
+              <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--abu);margin-bottom:5px">
+                <span>Total kehadiran bulan ini</span>
+                <span id="dsh-bln-pct-txt" style="font-weight:700;color:var(--hijau-tua)">—</span>
+              </div>
+              <div style="background:#f0ebe0;border-radius:4px;height:8px;overflow:hidden">
+                <div id="dsh-bln-bar" style="height:100%;background:var(--hijau);border-radius:4px;width:0%;transition:width .5s"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daftar hadir hari ini -->
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><div><div class="ct">✅ Sudah Hadir Hari Ini</div><div class="cs" id="dsh-hadir-list-sub">Guru yang sudah check-in</div></div></div>
+          <div style="max-height:220px;overflow-y:auto;padding:8px 0" id="dsh-hadir-list">
+            <div style="color:var(--abu);font-size:12px;text-align:center;padding:30px 0">Memuat...</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- CHECK-IN -->
@@ -577,9 +870,39 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ANALISA GURU -->
+      <!-- RESET DATA -->
+      <div class="card" style="margin-top:18px;border:2px solid #fce4ec">
+        <div class="ch" style="background:#fff5f5">
+          <div><div class="ct" style="color:#c0392b">⚠️ Zona Berbahaya — Reset Data Supabase</div><div class="cs">Hapus seluruh data dari database. Tidak bisa dibatalkan.</div></div>
+        </div>
+        <div style="padding:20px 22px">
+          <div style="background:#fce4ec;border:1px solid #f5b7b1;border-radius:10px;padding:12px 15px;margin-bottom:16px;font-size:13px;color:#922b21;line-height:1.7">
+            ⚠️ <strong>Peringatan:</strong> Reset menghapus semua data Supabase secara permanen. Pastikan sudah backup!
+          </div>
+          <div style="margin-bottom:14px;display:flex;flex-direction:column;gap:7px">
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:9px 13px;background:#fff;border:1.5px solid #ddd;border-radius:8px" id="lbl-reset-absensi">
+              <input type="checkbox" id="chk-absensi" checked onchange="styleResetLabel()" style="width:15px;height:15px;accent-color:#c0392b"> 🗓 <strong>Absensi</strong> — semua rekap kehadiran
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:9px 13px;background:#fff;border:1.5px solid #ddd;border-radius:8px" id="lbl-reset-sesi">
+              <input type="checkbox" id="chk-sesi" checked onchange="styleResetLabel()" style="width:15px;height:15px;accent-color:#c0392b"> 🔑 <strong>Sesi Absensi</strong>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:9px 13px;background:#fff;border:1.5px solid #ddd;border-radius:8px" id="lbl-reset-kalender">
+              <input type="checkbox" id="chk-kalender" checked onchange="styleResetLabel()" style="width:15px;height:15px;accent-color:#c0392b"> 📅 <strong>Kalender Hijriah</strong>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:9px 13px;background:#fff;border:1.5px solid #ddd;border-radius:8px" id="lbl-reset-guru">
+              <input type="checkbox" id="chk-guru" onchange="styleResetLabel()" style="width:15px;height:15px;accent-color:#c0392b"> 👤 <strong>Data Guru</strong> (hati-hati!)
+            </label>
+          </div>
+          <div style="margin-bottom:14px">
+            <div style="font-size:12.5px;font-weight:700;color:var(--hijau-tua);margin-bottom:6px">Ketik <code>HAPUS SEMUA</code> untuk aktifkan tombol:</div>
+            <input type="text" id="inp-konfirmasi" placeholder="Ketik: HAPUS SEMUA" oninput="cekKonfirmasiReset()" style="border:2px solid #ddd;border-radius:8px;padding:9px 13px;font-size:13px;outline:none;font-family:inherit;width:100%;max-width:280px;transition:border-color .2s">
+          </div>
+          <button class="btn btn-r" id="btn-reset-db" onclick="resetDatabase()" disabled style="opacity:.45;cursor:not-allowed;padding:9px 20px">🗑 Reset Data Terpilih</button>
+          <span id="reset-status" style="font-size:12.5px;margin-left:12px;color:var(--abu)"></span>
+        </div>
+      </div>
+    </div>
     <div class="page" id="page-analisa">
 
       <!-- Filter Bar -->
@@ -687,26 +1010,497 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
 
 <div class="toast" id="toast"></div>
 
+<!-- =============================================
+     MODAL PENGATURAN
+     ============================================= -->
+<div class="stt-overlay" id="stt-overlay" onclick="if(event.target===this)tutupSettings()">
+  <div class="stt-modal">
+    <div class="stt-header">
+      <div class="stt-header-title">⚙️ Pengaturan Aplikasi</div>
+      <button class="stt-close" onclick="tutupSettings()">✕</button>
+    </div>
+    <div class="stt-body">
+      <!-- Nav kiri -->
+      <div class="stt-nav">
+        <button class="stt-ni on" onclick="sttGo('akun',this)"><span class="ic">🔐</span>Keamanan</button>
+        <button class="stt-ni" onclick="sttGo('profil',this)"><span class="ic">🏫</span>Profil Madrasah</button>
+        <button class="stt-ni" onclick="sttGo('koneksi',this)"><span class="ic">🔌</span>Koneksi Supabase</button>
+        <button class="stt-ni" onclick="sttGo('refresh',this)"><span class="ic">🔄</span>Auto-Refresh</button>
+        <button class="stt-ni" onclick="sttGo('tampilan',this)"><span class="ic">🎨</span>Tampilan</button>
+        <button class="stt-ni" onclick="sttGo('absensi',this)"><span class="ic">📋</span>Aturan Absensi</button>
+        <button class="stt-ni" onclick="sttGo('checkin',this)"><span class="ic">🖥️</span>Layar Check-in</button>
+        <button class="stt-ni" onclick="sttGo('backup',this)"><span class="ic">💾</span>Backup & Export</button>
+        <button class="stt-ni" onclick="sttGo('kalender',this)"><span class="ic">📅</span>Kalender Hijriah</button>
+        <button class="stt-ni" onclick="sttGo('tentang',this)"><span class="ic">ℹ️</span>Tentang Aplikasi</button>
+      </div>
+
+      <!-- Konten kanan -->
+      <div class="stt-content">
+
+        <!-- ===== KEAMANAN & AKUN ===== -->
+        <div class="stt-section active" id="stt-akun">
+          <div class="stt-sec-title">🔐 Keamanan & Akun</div>
+          <div class="stt-sec-sub">Ubah username dan password login aplikasi</div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Username</div><div class="stt-row-desc">Nama akun untuk login</div></div>
+              <div class="stt-inp-wrap"><input class="stt-inp" id="st-username" type="text" placeholder="Masukkan username baru"></div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Password Lama</div><div class="stt-row-desc">Verifikasi identitas Anda</div></div>
+              <div class="stt-inp-wrap"><input class="stt-inp" id="st-pass-lama" type="password" placeholder="Password saat ini"></div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Password Baru</div><div class="stt-row-desc">Minimal 6 karakter</div></div>
+              <div class="stt-inp-wrap"><input class="stt-inp" id="st-pass-baru" type="password" placeholder="Password baru"></div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Konfirmasi Password</div><div class="stt-row-desc">Ulangi password baru</div></div>
+              <div class="stt-inp-wrap"><input class="stt-inp" id="st-pass-konfirm" type="password" placeholder="Ulangi password baru"></div>
+            </div>
+            <div class="stt-row" style="justify-content:flex-end">
+              <button class="stt-btn-save" onclick="simpanAkun()">💾 Simpan Perubahan</button>
+            </div>
+          </div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Logout / Kunci Layar</div><div class="stt-row-desc">Kembali ke halaman login</div></div>
+              <button class="btn btn-r" onclick="doLogout()" style="font-size:12.5px;padding:7px 16px">🔒 Logout</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== PROFIL MADRASAH ===== -->
+        <div class="stt-section" id="stt-profil">
+          <div class="stt-sec-title">🏫 Profil Madrasah</div>
+          <div class="stt-sec-sub">Kustomisasi nama dan identitas lembaga</div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Teks Arab (Sidebar)</div><div class="stt-row-desc">Tampil di bagian atas sidebar</div></div>
+              <div class="stt-inp-wrap"><input class="stt-inp" id="st-ar" type="text" placeholder="المفتاح للعلوم" style="font-family:'Amiri',serif;font-size:16px;direction:rtl"></div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Nama Madrasah</div><div class="stt-row-desc">Tampil di sidebar & topbar</div></div>
+              <div class="stt-inp-wrap"><input class="stt-inp" id="st-nama-madrasah" type="text" placeholder="Tarbiyah Idadiyah al-Miftah"></div>
+            </div>
+
+            <div class="stt-row">
+              <div><div class="stt-row-label">Teks Arab (Layar Check-in)</div><div class="stt-row-desc">Tampil di kotak input check-in</div></div>
+              <div class="stt-inp-wrap"><input class="stt-inp" id="st-ar-checkin" type="text" placeholder="بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ" style="font-family:'Amiri',serif;font-size:15px;direction:rtl"></div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Sub-judul Check-in</div><div class="stt-row-desc">Teks di bawah tulisan Arab</div></div>
+              <div class="stt-inp-wrap"><input class="stt-inp" id="st-subcheckin" type="text" placeholder="Absensi Guru · Idadiyah al-Miftah"></div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Versi Aplikasi</div><div class="stt-row-desc">Tampil di footer sidebar</div></div>
+              <div class="stt-inp-wrap"><input class="stt-inp" id="st-versi" type="text" placeholder="v5.0"></div>
+            </div>
+            <div class="stt-row" style="justify-content:flex-end">
+              <button class="stt-btn-save" onclick="simpanProfil()">💾 Simpan & Terapkan</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== KONEKSI SUPABASE ===== -->
+        <div class="stt-section" id="stt-koneksi">
+          <div class="stt-sec-title">🔌 Koneksi Supabase</div>
+          <div class="stt-sec-sub">Status dan informasi koneksi database</div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Status Koneksi</div><div class="stt-row-desc">Kondisi saat ini</div></div>
+              <span id="st-conn-status" class="stt-conn-status no">⚫ Belum diuji</span>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Supabase URL</div><div class="stt-row-desc">Tersimpan langsung di file HTML</div></div>
+              <span id="st-sb-url-display" style="font-size:12px;color:var(--abu);font-family:monospace;word-break:break-all;max-width:240px;text-align:right">—</span>
+            </div>
+            <div class="stt-row" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
+              <div style="font-size:12.5px;color:var(--abu);line-height:1.6">
+                🔧 Untuk mengubah URL / Key, edit langsung variabel<br>
+                <code>SB_URL</code> dan <code>SB_KEY</code> di dalam file <code>index.html</code>
+              </div>
+              <button class="btn btn-g" onclick="testKoneksi()" style="font-size:12.5px;padding:7px 14px">🔍 Test Koneksi</button>
+            </div>
+          </div>
+          <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:11px 14px;font-size:12px;color:#1b5e20;line-height:1.6">
+            ✅ Konfigurasi hardcode lebih aman untuk file yang didistribusikan ke banyak perangkat. Semua laptop otomatis pakai koneksi yang sama tanpa perlu setting ulang.
+          </div>
+        </div>
+
+        <!-- ===== AUTO-REFRESH ===== -->
+        <div class="stt-section" id="stt-refresh">
+          <div class="stt-sec-title">🔄 Auto-Refresh & Notifikasi</div>
+          <div class="stt-sec-sub">Atur interval pembaruan data otomatis</div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Interval Refresh Dashboard</div><div class="stt-row-desc">Seberapa sering dashboard diperbarui</div></div>
+              <div class="stt-range-wrap">
+                <input type="range" id="st-refresh-dash" min="10" max="120" step="5" value="30" oninput="document.getElementById('st-refresh-dash-val').textContent=this.value+'dtk'" style="flex:1">
+                <span class="stt-range-val" id="st-refresh-dash-val">30dtk</span>
+              </div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Interval Polling Sesi</div><div class="stt-row-desc">Sinkron sesi antar perangkat</div></div>
+              <div class="stt-range-wrap">
+                <input type="range" id="st-refresh-sesi" min="5" max="60" step="5" value="15" oninput="document.getElementById('st-refresh-sesi-val').textContent=this.value+'dtk'" style="flex:1">
+                <span class="stt-range-val" id="st-refresh-sesi-val">15dtk</span>
+              </div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Suara Check-in Berhasil</div><div class="stt-row-desc">Bunyi "ding" saat guru berhasil check-in</div></div>
+              <label class="stt-toggle"><input type="checkbox" id="st-suara" checked><span class="stt-toggle-track"></span></label>
+            </div>
+            <div class="stt-row" style="justify-content:flex-end">
+              <button class="stt-btn-save" onclick="simpanRefresh()">💾 Simpan</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAMPILAN ===== -->
+        <div class="stt-section" id="stt-tampilan">
+          <div class="stt-sec-title">🎨 Tampilan & Tema</div>
+          <div class="stt-sec-sub">Sesuaikan tampilan aplikasi</div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Mode Gelap</div><div class="stt-row-desc">Ubah tampilan ke mode malam</div></div>
+              <label class="stt-toggle"><input type="checkbox" id="st-darkmode" onchange="terapkanDarkMode(this.checked)"><span class="stt-toggle-track"></span></label>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Warna Tema</div><div class="stt-row-desc">Warna utama sidebar & aksen</div></div>
+              <div class="stt-swatches" id="st-swatches">
+                <div class="stt-swatch on" data-tema="hijau" style="background:#1a3a2a" title="Hijau (default)" onclick="pilihTema('hijau',this)"></div>
+                <div class="stt-swatch" data-tema="biru" style="background:#1a2a4a" title="Biru Navy" onclick="pilihTema('biru',this)"></div>
+                <div class="stt-swatch" data-tema="ungu" style="background:#2d1a4a" title="Ungu" onclick="pilihTema('ungu',this)"></div>
+                <div class="stt-swatch" data-tema="merah" style="background:#4a1a1a" title="Merah Maroon" onclick="pilihTema('merah',this)"></div>
+                <div class="stt-swatch" data-tema="abu" style="background:#2a2a2a" title="Abu-abu" onclick="pilihTema('abu',this)"></div>
+              </div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Ukuran Font Konten</div><div class="stt-row-desc">Ukuran teks tabel dan konten</div></div>
+              <div class="stt-range-wrap">
+                <input type="range" id="st-fontsize" min="11" max="16" step="1" value="13" oninput="terapkanFontSize(this.value)" style="flex:1">
+                <span class="stt-range-val" id="st-fontsize-val">13px</span>
+              </div>
+            </div>
+            <div class="stt-row" style="justify-content:flex-end">
+              <button class="stt-btn-save" onclick="simpanTampilan()">💾 Simpan Tampilan</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ATURAN ABSENSI ===== -->
+        <div class="stt-section" id="stt-absensi">
+          <div class="stt-sec-title">📋 Aturan Absensi</div>
+          <div class="stt-sec-sub">Konfigurasi kategori keterlambatan check-in</div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Batas "Sangat Cepat"</div><div class="stt-row-desc">Kurang dari X menit setelah sesi dibuka</div></div>
+              <div class="stt-range-wrap">
+                <input type="range" id="st-batas-cepat" min="1" max="15" step="1" value="5" oninput="document.getElementById('st-batas-cepat-val').textContent='< '+this.value+' mnt'" style="flex:1">
+                <span class="stt-range-val" id="st-batas-cepat-val">&lt; 5 mnt</span>
+              </div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Batas "Tepat Waktu"</div><div class="stt-row-desc">Kurang dari X menit = tepat waktu</div></div>
+              <div class="stt-range-wrap">
+                <input type="range" id="st-batas-tepat" min="5" max="30" step="5" value="15" oninput="document.getElementById('st-batas-tepat-val').textContent='< '+this.value+' mnt'" style="flex:1">
+                <span class="stt-range-val" id="st-batas-tepat-val">&lt; 15 mnt</span>
+              </div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Batas "Agak Lambat"</div><div class="stt-row-desc">Kurang dari X menit = agak lambat</div></div>
+              <div class="stt-range-wrap">
+                <input type="range" id="st-batas-lambat" min="15" max="60" step="5" value="30" oninput="document.getElementById('st-batas-lambat-val').textContent='< '+this.value+' mnt'" style="flex:1">
+                <span class="stt-range-val" id="st-batas-lambat-val">&lt; 30 mnt</span>
+              </div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Blokir Duplikat Check-in</div><div class="stt-row-desc">Cegah guru check-in lebih dari sekali per sesi</div></div>
+              <label class="stt-toggle"><input type="checkbox" id="st-blokir-duplikat" checked><span class="stt-toggle-track"></span></label>
+            </div>
+            <div class="stt-row" style="justify-content:flex-end">
+              <button class="stt-btn-save" onclick="simpanAturanAbsensi()">💾 Simpan</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== LAYAR CHECK-IN ===== -->
+        <div class="stt-section" id="stt-checkin">
+          <div class="stt-sec-title">🖥️ Layar Check-in</div>
+          <div class="stt-sec-sub">Kustomisasi tampilan halaman check-in guru</div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Teks Hint / Petunjuk</div><div class="stt-row-desc">Teks di bawah input ID PPS</div></div>
+              <div class="stt-inp-wrap"><input class="stt-inp" id="st-hint" type="text" placeholder="Contoh: 14390784 → Enter → langsung tercatat Hadir"></div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Durasi Feedback Check-in</div><div class="stt-row-desc">Berapa detik notif check-in tampil</div></div>
+              <div class="stt-range-wrap">
+                <input type="range" id="st-durasi-fb" min="1" max="10" step="0.5" value="3.5" oninput="document.getElementById('st-durasi-fb-val').textContent=this.value+'dtk'" style="flex:1">
+                <span class="stt-range-val" id="st-durasi-fb-val">3.5dtk</span>
+              </div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Tampilkan Log Check-in</div><div class="stt-row-desc">Daftar siapa saja yang sudah check-in</div></div>
+              <label class="stt-toggle"><input type="checkbox" id="st-show-log" checked><span class="stt-toggle-track"></span></label>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Tampilkan Statistik Sisi</div><div class="stt-row-desc">Kotak hadir/alpha/total di samping</div></div>
+              <label class="stt-toggle"><input type="checkbox" id="st-show-stats" checked><span class="stt-toggle-track"></span></label>
+            </div>
+            <div class="stt-row" style="justify-content:flex-end">
+              <button class="stt-btn-save" onclick="simpanCheckinSettings()">💾 Simpan & Terapkan</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== BACKUP & EXPORT ===== -->
+        <div class="stt-section" id="stt-backup">
+          <div class="stt-sec-title">💾 Backup & Export</div>
+          <div class="stt-sec-sub">Ekspor seluruh data sekaligus dari Supabase</div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Export Semua Data Guru</div><div class="stt-row-desc">Download daftar guru ke Excel</div></div>
+              <button class="stt-btn-save" onclick="backupGuru()">⬇️ Export Guru.xlsx</button>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Export Semua Absensi</div><div class="stt-row-desc">Seluruh rekap absensi semua bulan</div></div>
+              <button class="stt-btn-save" onclick="backupAbsensi()">⬇️ Export Absensi.xlsx</button>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Export Full Backup</div><div class="stt-row-desc">Guru + Absensi + Sesi dalam satu file</div></div>
+              <button class="stt-btn-save" onclick="backupFull()" style="background:var(--emas);color:var(--hijau-tua)">📦 Full Backup.xlsx</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== KALENDER HIJRIAH ===== -->
+        <div class="stt-section" id="stt-kalender">
+          <div class="stt-sec-title">📅 Kalender Hijriah</div>
+          <div class="stt-sec-sub">Pengaturan konversi tanggal Hijriah</div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Offset Penyesuaian Hijriah</div><div class="stt-row-desc">Geser ±1–2 hari jika tanggal meleset</div></div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <button class="btn" onclick="ubahOffsetHijri(-1)" style="padding:5px 12px;font-size:14px;font-weight:700">−</button>
+                <span id="st-hijri-offset-val" style="font-size:14px;font-weight:700;color:var(--hijau-tua);min-width:40px;text-align:center">0 hari</span>
+                <button class="btn" onclick="ubahOffsetHijri(1)" style="padding:5px 12px;font-size:14px;font-weight:700">+</button>
+              </div>
+            </div>
+            <div class="stt-row">
+              <div><div class="stt-row-label">Preview Hari Ini</div><div class="stt-row-desc">Tanggal Hijriah setelah offset diterapkan</div></div>
+              <span id="st-hijri-preview" style="font-family:'Amiri',serif;font-size:16px;color:var(--hijau-tua);font-weight:700">—</span>
+            </div>
+            <div class="stt-row" style="justify-content:flex-end">
+              <button class="stt-btn-save" onclick="simpanOffsetHijri()">💾 Simpan Offset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TENTANG APLIKASI ===== -->
+        <div class="stt-section" id="stt-tentang">
+          <div class="stt-sec-title">ℹ️ Tentang Aplikasi</div>
+          <div class="stt-sec-sub">Informasi versi dan status sistem</div>
+          <div class="stt-group">
+            <div class="stt-row"><div class="stt-row-label">Nama Aplikasi</div><span style="font-size:13px;color:var(--abu)" id="inf-nama">Absensi Guru</span></div>
+            <div class="stt-row"><div class="stt-row-label">Versi</div><span style="font-size:13px;color:var(--abu)" id="inf-versi">v5.0</span></div>
+            <div class="stt-row"><div class="stt-row-label">Developer</div><span style="font-size:13px;color:var(--abu)" id="inf-dev">Nabil Ghufron</span></div>
+            <div class="stt-row"><div class="stt-row-label">Madrasah</div><span style="font-size:13px;color:var(--abu)" id="inf-madrasah">Tarbiyah Idadiyah al-Miftah</span></div>
+            <div class="stt-row">
+              <div class="stt-row-label">Status Supabase</div>
+              <span id="inf-supabase" class="stt-conn-status no">⚫ Tidak Terhubung</span>
+            </div>
+            <div class="stt-row"><div class="stt-row-label">Tanggal Akses</div><span style="font-size:13px;color:var(--abu)" id="inf-tanggal">—</span></div>
+          </div>
+          <div class="stt-group">
+            <div class="stt-row">
+              <div><div class="stt-row-label">Download SQL Setup</div><div class="stt-row-desc">Script SQL untuk setup tabel Supabase dari awal</div></div>
+              <button class="stt-btn-save" onclick="downloadSQL()" style="background:#1565c0">📥 Download .sql</button>
+            </div>
+          </div>
+          <div class="stt-group">
+            <div class="stt-row" style="justify-content:center">
+              <div style="text-align:center;padding:6px 0">
+                <div style="font-family:'Amiri',serif;color:var(--emas);font-size:20px;margin-bottom:4px" id="inf-ar">المفتاح للعلوم</div>
+                <div style="font-size:11.5px;color:var(--abu)">Dibuat dengan ❤️ untuk kemudahan administrasi madrasah</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /stt-content -->
+    </div><!-- /stt-body -->
+  </div><!-- /stt-modal -->
+</div><!-- /stt-overlay -->
+
 <script>
 // ===== LOGIN SIMPLE =====
+// =============================================
+// CONFIG — DEFAULT, LOAD, SAVE  (harus di atas login handler)
+// =============================================
+
+// Password default di-hash SHA-256 dari '907076'
+// CATATAN: setelah pertama kali run, password disimpan sebagai hash di localStorage.
+// Plaintext TIDAK pernah disimpan kembali ke localStorage.
+const CFG_DEFAULT = {
+  username: 'Nabil',
+  // Hash SHA-256 dari '907076' — bukan plaintext
+  passwordHash: '3948b4b6a67b8e53a8e5ed7f9280c225f6e64d97c5e90dc10afb577330268084',
+  ar: 'المفتاح للعلوم', namaMadrasah: 'Tarbiyah Idadiyah al-Miftah',
+  subjudul: 'Powered By Nabil Ghufron',
+  arCheckin: 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ',
+  subCheckin: 'Absensi Guru · Idadiyah al-Miftah',
+  versi: 'v5.0',
+  sbUrl: '', sbKey: '',
+  refreshDash: 30, refreshSesi: 15,
+  suara: true,
+  darkMode: false, tema: 'hijau', fontSize: 13,
+  batasCepat: 5, batasTepat: 15, batasLambat: 30,
+  blokirDuplikat: true,
+  hint: 'Contoh: 14390784 → Enter → langsung tercatat Hadir',
+  durasiFb: 3500,
+  showLog: true, showStats: true,
+  hijriOffset: 0,
+};
+
+function loadCfg() {
+  try { return Object.assign({}, CFG_DEFAULT, JSON.parse(localStorage.getItem('app_cfg') || '{}')); }
+  catch(e) { return { ...CFG_DEFAULT }; }
+}
+function saveCfg(partial) {
+  const cfg = loadCfg();
+  // Jika ada 'password' plaintext yang masih tersimpan dari versi lama, hapus
+  delete cfg.password;
+  Object.assign(cfg, partial);
+  localStorage.setItem('app_cfg', JSON.stringify(cfg));
+  return cfg;
+}
+
+// Hash string menggunakan SHA-256, return hex string
+async function hashPassword(plain) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// =============================================
+// LOGIN — BRUTE-FORCE PROTECTION CONFIG
+// =============================================
+const LOGIN_MAX_FAIL  = 5;   // max percobaan gagal
+const LOGIN_LOCK_SECS = 60;  // durasi kunci (detik)
+
 document.addEventListener('DOMContentLoaded',()=>{
   const loginModal = document.getElementById('login-modal');
-  const loginForm = document.getElementById('login-form');
-  if(loginForm){
-    loginForm.onsubmit = function(e){
+  const loginForm  = document.getElementById('login-form');
+  const loginBtn   = loginForm ? loginForm.querySelector('button[type=submit]') : null;
+  const errEl      = document.getElementById('login-error');
+
+  // --- Migrasi: jika masih ada password plaintext dari versi lama, hash & simpan ---
+  (async () => {
+    try {
+      const raw = JSON.parse(localStorage.getItem('app_cfg') || '{}');
+      if (raw.password && !raw.passwordHash) {
+        raw.passwordHash = await hashPassword(raw.password);
+        delete raw.password;
+        localStorage.setItem('app_cfg', JSON.stringify(raw));
+      }
+    } catch(_) {}
+  })();
+
+  // --- Helper: tampilkan error ---
+  function showLoginErr(msg) {
+    if (!errEl) return;
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+  }
+
+  // --- Helper: cek & terapkan lockout ---
+  function getLockState() {
+    try {
+      const s = JSON.parse(sessionStorage.getItem('lf') || '{}');
+      return { count: s.count || 0, until: s.until || 0 };
+    } catch(_) { return { count: 0, until: 0 }; }
+  }
+  function setLockState(count, until) {
+    sessionStorage.setItem('lf', JSON.stringify({ count, until }));
+  }
+
+  // --- Update tampilan tombol saat kunci ---
+  let lockTimer = null;
+  function startLockCountdown(until) {
+    if (lockTimer) clearInterval(lockTimer);
+    function tick() {
+      const sisa = Math.ceil((until - Date.now()) / 1000);
+      if (sisa <= 0) {
+        clearInterval(lockTimer);
+        lockTimer = null;
+        setLockState(0, 0);
+        if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Login'; }
+        if (errEl) errEl.style.display = 'none';
+        return;
+      }
+      if (loginBtn) loginBtn.textContent = `Coba lagi dalam ${sisa}s`;
+      showLoginErr(`Terlalu banyak percobaan gagal. Tunggu ${sisa} detik.`);
+    }
+    tick();
+    lockTimer = setInterval(tick, 1000);
+  }
+
+  // Cek apakah saat halaman dimuat masih dalam kondisi terkunci
+  const initLock = getLockState();
+  if (initLock.until > Date.now()) {
+    if (loginBtn) loginBtn.disabled = true;
+    startLockCountdown(initLock.until);
+  }
+
+  if (loginForm) {
+    loginForm.onsubmit = async function(e) {
       e.preventDefault();
+
+      // Cek lockout
+      const ls = getLockState();
+      if (ls.until > Date.now()) {
+        startLockCountdown(ls.until);
+        return;
+      }
+
       const u = document.getElementById('login-username').value.trim();
       const p = document.getElementById('login-password').value;
-      if(u==='Nabil' && p==='907076'){
-        loginModal.style.display='none';
-        document.body.style.overflow='auto';
-      }else{
-        const err = document.getElementById('login-error');
-        err.textContent = 'Username atau password salah!';
-        err.style.display = 'block';
+      if (!u || !p) { showLoginErr('Username dan password wajib diisi!'); return; }
+
+      // Nonaktifkan tombol selama proses hashing
+      if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = 'Memeriksa...'; }
+
+      try {
+        const cfg       = loadCfg();
+        const inputHash = await hashPassword(p);
+        const validHash = cfg.passwordHash || CFG_DEFAULT.passwordHash;
+
+        if (u === cfg.username && inputHash === validHash) {
+          // ✅ Login berhasil — reset counter, hapus modal dari DOM
+          setLockState(0, 0);
+          document.body.style.overflow = 'auto';
+          loginModal.remove();   // hapus dari DOM, bukan sekadar hide
+        } else {
+          // ❌ Gagal
+          const newCount = ls.count + 1;
+          if (newCount >= LOGIN_MAX_FAIL) {
+            const until = Date.now() + LOGIN_LOCK_SECS * 1000;
+            setLockState(newCount, until);
+            startLockCountdown(until);
+          } else {
+            setLockState(newCount, 0);
+            const sisa = LOGIN_MAX_FAIL - newCount;
+            showLoginErr(`Username atau password salah! (${sisa} percobaan tersisa)`);
+            if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Login'; }
+          }
+        }
+      } catch(err) {
+        showLoginErr('Terjadi kesalahan. Coba lagi.');
+        if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Login'; }
       }
     };
-    document.body.style.overflow='hidden';
+    document.body.style.overflow = 'hidden';
   }
 });
 
@@ -720,8 +1514,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 //
 // SQL untuk membuat tabel (jalankan sekali di Supabase SQL Editor) — lihat file SQL terpisah.
 // ══════════════════════════════════════════════════════════════
-const SB_URL = 'https://ttftmzfncjtfyrphanlw.supabase.co';
-const SB_KEY = 'sb_publishable_DTSgzhCZp4dQXKUgANcqiQ_6dL-NxYR';
+const SB_URL = 'https://rttcqjfvpcpdxodfwzeo.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0dGNxamZ2cGNwZHhvZGZ3emVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0OTAwMjEsImV4cCI6MjA5MzA2NjAyMX0.F3CmOnIgbwRNaUIGs7zO2-HQ0Wln8xqgw0BnhcS3GM8';
 
 // ===== KONSTANTA =====
 const BLN_H = ['','Muharram','Shafar','Rabiul Awwal','Rabiul Akhir','Jumadal Ula','Jumadal Akhirah','Rajab','Syaban','Ramadhan','Syawwal','Dzulqadah','Dzulhijjah'];
@@ -1188,6 +1982,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   jamInterval = setInterval(tickJam, 1000);
   setJamModeBadge('otomatis');
+  initSettings();   // ← terapkan semua setting tersimpan
   connect(true);
 });
 
@@ -1197,7 +1992,7 @@ function go(nama, btn){
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
   document.getElementById('page-'+nama).classList.add('active');
   if(btn) btn.classList.add('on');
-  const tt = {dashboard:'Dashboard',checkin:'Layar Check-in Guru',rekap:'Rekap Bulanan',guru:'Data Guru',upload:'Upload Data Guru',analisa:'🔬 Analisa Kehadiran Guru'};
+  const tt = {dashboard:'Dashboard',checkin:'Layar Check-in Guru',rekap:'Rekap Bulanan',guru:'Data Guru',upload:'Upload Data Guru',analisa:'🔬 Analisa Kehadiran Guru',setting:'⚙️ Pengaturan'};
   document.getElementById('page-title').textContent = tt[nama]||nama;
   activePage = nama;
 
@@ -1382,45 +2177,238 @@ async function updateSideStats(){
 // ===== DASHBOARD =====
 async function loadDashboard(){
   if(!sb) return;
-  const tgl = getTanggalSesi(); // null jika tidak ada sesi
-  let hadirHariIni = 0;
-  if(tgl){
-    const {data:dH}=await sb.from('absensi').select('status').eq('tanggal',tgl);
-    hadirHariIni = (dH||[]).filter(a=>a.status==='H').length;
+  const tgl    = getTanggalSesi();
+  const total  = daftarGuru.length;
+  const hh     = todayHijri();
+
+  // Patch ID lama yang masih dipakai di codebase lain
+  const _set = (id, v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+
+  // ── 1. Info sesi aktif ──────────────────────────────────────
+  const strip  = document.getElementById('dsh-sesi-strip');
+  const badge  = document.getElementById('dsh-sesi-badge');
+  if(sesiAktif){
+    _set('dsh-sesi-tgl', sesiAktif.hijri_label || '—');
+    _set('dsh-sesi-sub', 'Dibuka: ' + (sesiAktif.dibuka_pada || '—'));
+    badge.textContent = '🟢 Sesi Aktif';
+    badge.style.background = 'rgba(76,175,80,.25)';
+    strip.style.background = 'linear-gradient(135deg,#1a3a2a,#2d6a4f)';
+  } else {
+    _set('dsh-sesi-tgl', 'Belum ada sesi aktif hari ini');
+    _set('dsh-sesi-sub', new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+    badge.textContent = '⚫ Tidak Ada Sesi';
+    badge.style.background = 'rgba(255,255,255,.12)';
+    strip.style.background = 'linear-gradient(135deg,#3d3d3d,#555)';
   }
-  document.getElementById('s-hadir').textContent = tgl ? hadirHariIni : '—';
 
-  // Alpha = total guru - yang hadir di sesi aktif
-  const alphaHariIni = tgl ? Math.max(0, daftarGuru.length - hadirHariIni) : '—';
-  document.getElementById('s-alpha').textContent = alphaHariIni;
+  // ── 2. Absensi hari ini ─────────────────────────────────────
+  let hadirHariIni=0, stHariIni={H:0,A:0,I:0,S:0};
+  if(tgl){
+    const {data:dHari} = await sb.from('absensi').select('status').eq('tanggal',tgl);
+    (dHari||[]).forEach(a=>{ stHariIni[a.status]=(stHariIni[a.status]||0)+1; });
+    hadirHariIni = stHariIni.H;
+  }
+  const belumHadir = tgl ? Math.max(0, total - hadirHariIni) : '—';
+  _set('dsh-hadir',  tgl ? hadirHariIni : '—');
+  _set('dsh-belum',  belumHadir);
+  _set('dsh-total',  total);
+  _set('dsh-hadir-sub', tgl ? 'dari '+total+' guru' : 'sesi belum dibuka');
 
-  // % Hadir Bulan Ini — ambil dari sesi Hijriah bulan ini via kalender_hijriah
-  const hh = todayHijri();
-  const { data: sesibulan } = await sb
-    .from('kalender_hijriah')
+  // Stat cards lama (backward compat)
+  _set('s-hadir', tgl ? hadirHariIni : '—');
+  _set('s-alpha', belumHadir);
+  _set('s-total', total);
+
+  // Ring chart distribusi status hari ini
+  const ringTotal = stHariIni.H + stHariIni.A + stHariIni.I + stHariIni.S;
+  const pctHadir  = ringTotal>0 ? Math.round(stHariIni.H/ringTotal*100) : 0;
+  _set('dsh-ring-pct', tgl ? pctHadir+'%' : '—');
+  _set('dsh-st-H', stHariIni.H); _set('dsh-st-A', stHariIni.A);
+  _set('dsh-st-I', stHariIni.I); _set('dsh-st-S', stHariIni.S);
+  _set('dsh-dist-sub', tgl ? 'Sesi: '+( sesiAktif?.hijri_label||tgl) : 'Belum ada sesi');
+
+  // Animasi ring SVG (conic-style via stroke-dashoffset)
+  if(tgl && ringTotal>0){
+    const circ = 276; // 2π×44
+    const segH = circ * stHariIni.H / ringTotal;
+    const segA = circ * stHariIni.A / ringTotal;
+    const segI = circ * stHariIni.I / ringTotal;
+    let offset = 0;
+    const setRing = (id, seg, off) => {
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.style.strokeDasharray  = seg + ' ' + (circ - seg);
+      el.style.strokeDashoffset = -off;
+    };
+    setRing('ring-H', segH, offset); offset += segH;
+    setRing('ring-A', segA, offset); offset += segA;
+    setRing('ring-I', segI, offset); offset += segI;
+    setRing('ring-S', circ * stHariIni.S / ringTotal, offset);
+  }
+
+  // Daftar guru yang sudah hadir hari ini
+  const listEl = document.getElementById('dsh-hadir-list');
+  const listSub = document.getElementById('dsh-hadir-list-sub');
+  if(tgl && hadirHariIni>0){
+    const {data:dHd} = await sb.from('absensi')
+      .select('id_pps,created_at,guru(nama,dom)')
+      .eq('tanggal',tgl).eq('status','H')
+      .order('created_at',{ascending:true});
+    listSub.textContent = hadirHariIni + ' guru check-in';
+    listEl.innerHTML = (dHd||[]).map((a,i)=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 18px;border-bottom:1px solid #f5f0e8">
+        <span style="font-size:11px;color:var(--abu);min-width:18px">${i+1}</span>
+        <span style="font-size:13px;font-weight:600;flex:1">${a.guru?.nama||a.id_pps}</span>
+        <span style="font-size:11px;color:var(--abu)">${a.guru?.dom||'—'}</span>
+        <span style="font-size:11px;color:#2e7d32;font-weight:700">${a.created_at ? new Date(a.created_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : ''}</span>
+      </div>`).join('');
+  } else {
+    listSub.textContent = 'Guru yang sudah check-in';
+    listEl.innerHTML = `<div style="color:var(--abu);font-size:12px;text-align:center;padding:30px 0">${tgl?'Belum ada yang check-in':'Sesi belum dibuka'}</div>`;
+  }
+
+  // ── 3. Data bulan ini ──────────────────────────────────────
+  const {data:sesibulan} = await sb.from('kalender_hijriah')
     .select('tanggal_sesi')
     .eq('hijri_month', hh.month)
-    .eq('hijri_year', hh.year);
-  const tglBulanIni = (sesibulan||[]).map(s=>s.tanggal_sesi);
-  let hadirB = 0, tot = 0;
-  if(tglBulanIni.length > 0){
-    const { data: dB } = await sb.from('absensi').select('status').in('tanggal', tglBulanIni);
-    tot = (dB||[]).length;
-    hadirB = (dB||[]).filter(a=>a.status==='H').length;
-  }
-  document.getElementById('s-persen').textContent=tot>0?Math.round(hadirB/tot*100)+'%':'—';
+    .eq('hijri_year',  hh.year);
+  const tglBulan = (sesibulan||[]).map(s=>s.tanggal_sesi);
+  const jmlSesi  = tglBulan.length;
+  _set('dsh-jml-sesi', jmlSesi || '0');
 
-  const {data:tk}=await sb.from('absensi').select('*,guru(nama,dom,tingkatan)').order('created_at',{ascending:false}).limit(10);
-  const lbl={H:'Hadir',A:'Alpha',I:'Izin',S:'Sakit'};
-  const tb=document.getElementById('tb-terkini');
-  if(!tk||!tk.length){ tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="ic">📭</div><p>Belum ada absensi</p></div></td></tr>'; return; }
-  tb.innerHTML=tk.map(a=>`<tr>
-    <td style="font-weight:600">${a.guru?.nama||a.id_pps}</td>
-    <td>${a.guru?.dom||'—'}</td><td>${a.guru?.tingkatan||'—'}</td>
-    <td>${a.hijri_label||a.tanggal}</td>
-    <td><span class="badge ${a.status}">${lbl[a.status]||a.status}</span></td>
-    <td style="color:var(--abu);font-size:12.5px">${a.keterangan||'—'}</td>
-  </tr>`).join('');
+  let blnH=0,blnA=0,blnI=0,blnS=0;
+  let perGuruBulan = {}; // id_pps -> {H,A,I,S,nama,dom}
+  if(tglBulan.length>0){
+    const {data:dBulan} = await sb.from('absensi')
+      .select('id_pps,status,guru(nama,dom)')
+      .in('tanggal', tglBulan);
+    (dBulan||[]).forEach(a=>{
+      if(a.status==='H') blnH++;
+      else if(a.status==='A') blnA++;
+      else if(a.status==='I') blnI++;
+      else if(a.status==='S') blnS++;
+      if(!perGuruBulan[a.id_pps]) perGuruBulan[a.id_pps]={H:0,A:0,I:0,S:0,nama:a.guru?.nama||a.id_pps,dom:a.guru?.dom||'—'};
+      perGuruBulan[a.id_pps][a.status]++;
+    });
+  }
+  const totBulan = blnH+blnA+blnI+blnS;
+  const pctBulan = totBulan>0 ? Math.round(blnH/totBulan*100) : 0;
+  _set('dsh-pct-bulan', totBulan>0 ? pctBulan+'%' : '—');
+  _set('dsh-pct-sub', totBulan>0 ? blnH+' dari '+totBulan+' absensi' : jmlSesi+' sesi, belum ada data');
+  _set('s-persen', totBulan>0 ? pctBulan+'%' : '—');
+  _set('dsh-bln-H', blnH); _set('dsh-bln-A', blnA);
+  _set('dsh-bln-I', blnI); _set('dsh-bln-S', blnS);
+  const barBln = document.getElementById('dsh-bln-bar');
+  if(barBln) barBln.style.width = pctBulan+'%';
+  if(barBln) barBln.style.background = pctBulan>=80?'var(--hijau)':pctBulan>=60?'#ffa726':'#ef5350';
+  _set('dsh-bln-pct-txt', totBulan>0 ? pctBulan+'%' : '—');
+  const blnNama = ['','Muharram','Shafar','Rabi\'ul Awwal','Rabi\'ul Akhir','Jumadal Ula','Jumadal Akhirah','Rajab','Sya\'ban','Ramadhan','Syawwal','Dzulqadah','Dzulhijjah'];
+  _set('dsh-rekap-sub', (blnNama[hh.month]||'Bulan ini')+' '+hh.year+' H · '+jmlSesi+' sesi');
+
+  // ── 4. Top 5 rajin & Top 5 alpha ──────────────────────────
+  const guruArr = Object.values(perGuruBulan);
+  // Tambah guru yang 0 absensi
+  daftarGuru.forEach(g=>{
+    if(!perGuruBulan[g.id_pps]) guruArr.push({H:0,A:0,I:0,S:0,nama:g.nama,dom:g.dom||'—'});
+  });
+  guruArr.forEach(g=>{ g.tot=g.H+g.A+g.I+g.S; g.pct=g.tot>0?Math.round(g.H/g.tot*100):0; });
+
+  const top5Rajin = [...guruArr].filter(g=>g.tot>0).sort((a,b)=>b.pct-a.pct||b.H-a.H).slice(0,5);
+  const top5Alpha = [...guruArr].filter(g=>g.A>0).sort((a,b)=>b.A-a.A).slice(0,5);
+
+  // Best guru untuk header card
+  if(top5Rajin.length>0){
+    _set('dsh-best-pct', top5Rajin[0].pct+'%');
+    _set('dsh-best-nm', top5Rajin[0].nama);
+  }
+
+  const renderBar = (arr, valFn, color) => arr.length===0
+    ? '<div style="color:var(--abu);font-size:12px;text-align:center;padding:16px 0">Belum ada data</div>'
+    : arr.map((g,i)=>{
+        const v=valFn(g), max=valFn(arr[0])||1, pct=Math.round(v/max*100);
+        return `<div class="dsh-bar-row">
+          <span class="dsh-bar-nm">${i+1}. ${g.nama}</span>
+          <div class="dsh-bar-bg"><div class="dsh-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+          <span class="dsh-bar-pct" style="color:${color}">${v}${valFn===g=>g.pct?'':'x'}</span>
+        </div>`;
+      }).join('');
+
+  const rEl=document.getElementById('dsh-top-rajin');
+  if(rEl) rEl.innerHTML = top5Rajin.length===0
+    ? '<div style="color:var(--abu);font-size:12px;text-align:center;padding:16px 0">Belum ada data</div>'
+    : top5Rajin.map((g,i)=>{
+        const color=g.pct>=80?'#2e7d32':g.pct>=60?'#ffa726':'#ef5350';
+        return `<div class="dsh-bar-row">
+          <span class="dsh-bar-nm">${i+1}. ${g.nama}</span>
+          <div class="dsh-bar-bg"><div class="dsh-bar-fill" style="width:${g.pct}%;background:${color}"></div></div>
+          <span class="dsh-bar-pct" style="color:${color}">${g.pct}%</span>
+        </div>`;
+      }).join('');
+
+  const aEl=document.getElementById('dsh-top-alpha');
+  if(aEl) aEl.innerHTML = top5Alpha.length===0
+    ? '<div style="color:var(--abu);font-size:12px;text-align:center;padding:16px 0">Tidak ada alpha bulan ini 🎉</div>'
+    : top5Alpha.map((g,i)=>`<div class="dsh-bar-row">
+        <span class="dsh-bar-nm">${i+1}. ${g.nama}</span>
+        <div class="dsh-bar-bg"><div class="dsh-bar-fill" style="width:${Math.round(g.A/(top5Alpha[0].A||1)*100)}%;background:#c62828"></div></div>
+        <span class="dsh-bar-pct" style="color:#c62828">${g.A}x</span>
+      </div>`).join('');
+
+  // ── 5. Breakdown per Dom ────────────────────────────────────
+  const domMap = {};
+  guruArr.forEach(g=>{
+    const d=g.dom||'—';
+    if(!domMap[d]) domMap[d]={H:0,tot:0};
+    domMap[d].H+=g.H; domMap[d].tot+=g.tot;
+  });
+  const domArr=Object.entries(domMap).map(([d,v])=>({dom:d,pct:v.tot>0?Math.round(v.H/v.tot*100):0,H:v.H,tot:v.tot}))
+    .filter(d=>d.tot>0).sort((a,b)=>b.pct-a.pct);
+  const dEl=document.getElementById('dsh-dom-chart');
+  if(dEl) dEl.innerHTML = domArr.length===0
+    ? '<div style="color:var(--abu);font-size:12px;text-align:center;padding:16px 0">Belum ada data</div>'
+    : domArr.map(d=>{
+        const color=d.pct>=80?'#2e7d32':d.pct>=60?'#ffa726':'#ef5350';
+        return `<div class="dsh-dom-row">
+          <span style="font-weight:600;color:var(--hijau-tua)">${d.dom}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:70px;background:#f0ebe0;border-radius:4px;height:6px;overflow:hidden">
+              <div style="width:${d.pct}%;height:100%;background:${color};border-radius:4px"></div>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:${color};min-width:35px">${d.pct}%</span>
+          </div>
+        </div>`;
+      }).join('');
+
+  // ── 6. Tren 7 sesi terakhir ─────────────────────────────────
+  const {data:sesiAll} = await sb.from('sesi_absensi')
+    .select('tanggal_key,hijri_day,hijri_label')
+    .order('tanggal_key',{ascending:false}).limit(7);
+  const sesi7 = (sesiAll||[]).reverse();
+
+  if(sesi7.length>0){
+    const tglKeys7 = sesi7.map(s=>s.tanggal_key);
+    const {data:abs7} = await sb.from('absensi').select('tanggal,status').in('tanggal',tglKeys7);
+    const mapAbs7 = {};
+    (abs7||[]).forEach(a=>{ if(!mapAbs7[a.tanggal]) mapAbs7[a.tanggal]={H:0,tot:0}; mapAbs7[a.tanggal].tot++; if(a.status==='H') mapAbs7[a.tanggal].H++; });
+
+    const bars = sesi7.map(s=>{
+      const d=mapAbs7[s.tanggal_key]||{H:0,tot:0};
+      const pct=d.tot>0?Math.round(d.H/d.tot*100):0;
+      const color=pct>=80?'#2e7d32':pct>=60?'#ffa726':'#ef5350';
+      const h=Math.max(6,Math.round(pct*44/100));
+      return {pct,color,h,day:s.hijri_day,label:s.hijri_label||s.tanggal_key};
+    });
+    const maxH=44;
+    const trenEl=document.getElementById('dsh-tren-chart');
+    const lblEl=document.getElementById('dsh-tren-labels');
+    if(trenEl) trenEl.innerHTML = bars.map(b=>`
+      <div class="dsh-tren-bar" data-tip="${b.label}: ${b.pct}%" style="height:${b.h}px;background:${b.color}"></div>
+    `).join('');
+    if(lblEl) lblEl.innerHTML = bars.map(b=>`<span style="font-size:9.5px;color:var(--abu);text-align:center;flex:1">${b.day}</span>`).join('');
+  } else {
+    const trenEl=document.getElementById('dsh-tren-chart');
+    if(trenEl) trenEl.innerHTML='<div style="color:var(--abu);font-size:12px;text-align:center;width:100%">Belum ada data sesi</div>';
+  }
 }
 
 // ===== REKAP BULANAN — 1 SESI PER HARI =====
@@ -2070,6 +3058,578 @@ function exportAnalisaExcel(){
   toast('✅ Export berhasil!','suc');
 }
 
+
+// =============================================
+// SETTINGS — STATE & HELPERS
+// =============================================
+
+// Buka & tutup modal
+function bukaSettings() {
+  const cfg = loadCfg();
+  // Isi semua field
+  el('st-username').value    = cfg.username;
+  el('st-sb-url-display').textContent = (typeof SB_URL !== 'undefined' && SB_URL) ? SB_URL : '(belum diisi di kode)';
+  el('st-ar').value          = cfg.ar;
+  el('st-nama-madrasah').value = cfg.namaMadrasah;
+  el('st-ar-checkin').value  = cfg.arCheckin;
+  el('st-subcheckin').value  = cfg.subCheckin;
+  el('st-versi').value       = cfg.versi;
+  el('st-refresh-dash').value  = cfg.refreshDash;
+  el('st-refresh-dash-val').textContent = cfg.refreshDash + 'dtk';
+  el('st-refresh-sesi').value  = cfg.refreshSesi;
+  el('st-refresh-sesi-val').textContent = cfg.refreshSesi + 'dtk';
+  el('st-suara').checked     = cfg.suara;
+  el('st-darkmode').checked  = cfg.darkMode;
+  el('st-fontsize').value    = cfg.fontSize;
+  el('st-fontsize-val').textContent = cfg.fontSize + 'px';
+  el('st-batas-cepat').value = cfg.batasCepat;
+  el('st-batas-cepat-val').textContent = '< ' + cfg.batasCepat + ' mnt';
+  el('st-batas-tepat').value = cfg.batasTepat;
+  el('st-batas-tepat-val').textContent = '< ' + cfg.batasTepat + ' mnt';
+  el('st-batas-lambat').value = cfg.batasLambat;
+  el('st-batas-lambat-val').textContent = '< ' + cfg.batasLambat + ' mnt';
+  el('st-blokir-duplikat').checked = cfg.blokirDuplikat;
+  el('st-hint').value        = cfg.hint;
+  el('st-durasi-fb').value   = cfg.durasiFb / 1000;
+  el('st-durasi-fb-val').textContent = (cfg.durasiFb / 1000) + 'dtk';
+  el('st-show-log').checked  = cfg.showLog;
+  el('st-show-stats').checked = cfg.showStats;
+  // Hijri offset
+  window._hijriOffset = cfg.hijriOffset || 0;
+  updateHijriPreview();
+  // Tema swatch
+  document.querySelectorAll('.stt-swatch').forEach(s => {
+    s.classList.toggle('on', s.dataset.tema === cfg.tema);
+  });
+  window._pilihanTema = cfg.tema;
+  // Info tentang
+  el('inf-nama').textContent     = 'Absensi Guru — ' + cfg.namaMadrasah;
+  el('inf-versi').textContent    = cfg.versi;
+  el('inf-dev').textContent      = 'Nabil Ghufron';
+  el('inf-madrasah').textContent = cfg.namaMadrasah;
+  el('inf-tanggal').textContent  = todayMasehi();
+  el('inf-ar').textContent       = cfg.ar;
+  const sbOk = !!sb;
+  el('inf-supabase').className   = 'stt-conn-status ' + (sbOk ? 'ok' : 'no');
+  el('inf-supabase').textContent = sbOk ? '🟢 Terhubung' : '🔴 Tidak Terhubung';
+  el('st-conn-status').className = 'stt-conn-status ' + (sbOk ? 'ok' : 'no');
+  el('st-conn-status').textContent = sbOk ? '🟢 Terhubung' : '🔴 Tidak Terhubung';
+  document.getElementById('stt-overlay').classList.add('show');
+}
+
+function tutupSettings() {
+  document.getElementById('stt-overlay').classList.remove('show');
+}
+
+function sttGo(nama, btn) {
+  document.querySelectorAll('.stt-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.stt-ni').forEach(n => n.classList.remove('on'));
+  document.getElementById('stt-' + nama).classList.add('active');
+  if(btn) btn.classList.add('on');
+}
+
+function el(id) { return document.getElementById(id); }
+
+// ===== KEAMANAN / AKUN =====
+async function simpanAkun() {
+  const cfg   = loadCfg();
+  const uBaru = el('st-username').value.trim();
+  const pLama = el('st-pass-lama').value;
+  const pBaru = el('st-pass-baru').value;
+  const pKon  = el('st-pass-konfirm').value;
+  if(!uBaru) { toast('Username tidak boleh kosong!','err'); return; }
+  if(pLama || pBaru || pKon) {
+    // Verifikasi password lama dengan hash
+    const hashLama = await hashPassword(pLama);
+    const validHash = cfg.passwordHash || CFG_DEFAULT.passwordHash;
+    if(hashLama !== validHash)  { toast('❌ Password lama salah!','err'); return; }
+    if(pBaru.length < 6)        { toast('Password baru minimal 6 karakter!','err'); return; }
+    if(pBaru !== pKon)          { toast('Konfirmasi password tidak cocok!','err'); return; }
+    const hashBaru = await hashPassword(pBaru);
+    saveCfg({ username: uBaru, passwordHash: hashBaru });
+  } else {
+    saveCfg({ username: uBaru });
+  }
+  el('st-pass-lama').value = '';
+  el('st-pass-baru').value = '';
+  el('st-pass-konfirm').value = '';
+  toast('✅ Akun berhasil diperbarui!','suc');
+}
+
+function doLogout() {
+  if(!confirm('Yakin ingin logout?')) return;
+  tutupSettings();
+  location.reload();
+}
+
+// ===== PROFIL MADRASAH =====
+function simpanProfil() {
+  const cfg = saveCfg({
+    ar:           el('st-ar').value.trim()            || CFG_DEFAULT.ar,
+    namaMadrasah: el('st-nama-madrasah').value.trim() || CFG_DEFAULT.namaMadrasah,
+    arCheckin:    el('st-ar-checkin').value.trim()    || CFG_DEFAULT.arCheckin,
+    subCheckin:   el('st-subcheckin').value.trim()    || CFG_DEFAULT.subCheckin,
+    versi:        el('st-versi').value.trim()         || CFG_DEFAULT.versi,
+  });
+  terapkanProfil(cfg);
+  toast('✅ Profil madrasah disimpan!','suc');
+}
+
+function terapkanProfil(cfg) {
+  // Sidebar
+  const elAr = document.querySelector('.sb-logo .ar');
+  const elNm = document.querySelector('.sb-logo .nm');
+  const elSb2 = document.querySelector('.sb-logo .sb2');
+  const elFt  = document.querySelector('.sb-ft');
+  if(elAr)  elAr.textContent  = cfg.ar;
+  if(elNm)  elNm.textContent  = cfg.namaMadrasah;
+  if(elSb2) elSb2.textContent = cfg.subjudul;
+  if(elFt)  elFt.innerHTML    = cfg.namaMadrasah + '<br>' + cfg.versi;
+  // Check-in
+  const elCiAr  = document.querySelector('.ci-ar');
+  const elCiSub = document.querySelector('.ci-sub');
+  if(elCiAr)  elCiAr.textContent  = cfg.arCheckin;
+  if(elCiSub) elCiSub.textContent = cfg.subCheckin;
+  // Title tab
+  document.title = 'Absensi Guru — ' + cfg.namaMadrasah;
+}
+
+// ===== KONEKSI SUPABASE =====
+async function testKoneksi() {
+  const stEl = el('st-conn-status');
+  stEl.className = 'stt-conn-status testing';
+  stEl.textContent = '🟡 Menguji...';
+  try {
+    if(!sb) throw new Error('Supabase belum diinisialisasi');
+    const { error } = await sb.from('guru').select('id_pps').limit(1);
+    if(error) throw error;
+    stEl.className = 'stt-conn-status ok';
+    stEl.textContent = '🟢 Berhasil terhubung!';
+    toast('✅ Koneksi berhasil!','suc');
+  } catch(e) {
+    stEl.className = 'stt-conn-status no';
+    stEl.textContent = '🔴 Gagal: ' + e.message;
+    toast('❌ ' + e.message,'err');
+  }
+}
+
+// ===== DOWNLOAD SQL =====
+function downloadSQL() {
+  const sql = `-- ================================================================
+-- SISTEM ABSENSI GURU — Idadiyah al-Miftah
+-- Supabase SQL Setup — v5.0 (1 sesi per hari)
+-- Diaudit langsung dari seluruh query di index.html
+--
+-- CARA PAKAI:
+--   A. Database BARU  -> jalankan Bagian 1-5 saja
+--   B. Database LAMA (dari v4.x yang pakai J1/J2/J3)
+--      -> jalankan semua Bagian 1-7
+-- ================================================================
+
+
+-- ================================================================
+-- BAGIAN 1 — TABEL GURU
+-- ================================================================
+CREATE TABLE IF NOT EXISTS guru (
+  id          BIGSERIAL PRIMARY KEY,
+  id_pps      TEXT UNIQUE NOT NULL,
+  nama        TEXT NOT NULL,
+  dom         TEXT,
+  tingkatan   TEXT,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_guru_id_pps ON guru (id_pps);
+CREATE INDEX IF NOT EXISTS idx_guru_nama   ON guru (nama);
+
+
+-- ================================================================
+-- BAGIAN 2 — TABEL KALENDER_HIJRIAH
+-- ================================================================
+CREATE TABLE IF NOT EXISTS kalender_hijriah (
+  id           BIGSERIAL PRIMARY KEY,
+  tanggal_sesi TEXT UNIQUE NOT NULL,
+  hijri_day    INT,
+  hijri_month  INT,
+  hijri_year   INT,
+  hijri_label  TEXT,
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_kalender_bulan ON kalender_hijriah (hijri_month, hijri_year);
+CREATE INDEX IF NOT EXISTS idx_kalender_tgl   ON kalender_hijriah (tanggal_sesi);
+
+
+-- ================================================================
+-- BAGIAN 3 — TABEL SESI_ABSENSI
+-- ================================================================
+CREATE TABLE IF NOT EXISTS sesi_absensi (
+  id                  BIGSERIAL PRIMARY KEY,
+  tanggal_key         TEXT UNIQUE NOT NULL,
+  hijri_label         TEXT,
+  hijri_day           INT,
+  hijri_month         INT,
+  hijri_year          INT,
+  is_aktif            BOOLEAN DEFAULT TRUE,
+  dibuka_pada         TEXT,
+  dibuka_jam          TIMESTAMPTZ,
+  jam_offset          BIGINT,
+  jam_offset_set_at   TIMESTAMPTZ,
+  created_at          TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_sesi_aktif ON sesi_absensi (is_aktif);
+CREATE INDEX IF NOT EXISTS idx_sesi_bulan ON sesi_absensi (hijri_month, hijri_year);
+CREATE INDEX IF NOT EXISTS idx_sesi_tgl   ON sesi_absensi (tanggal_key);
+
+
+-- ================================================================
+-- BAGIAN 4 — TABEL ABSENSI
+-- ================================================================
+CREATE TABLE IF NOT EXISTS absensi (
+  id          BIGSERIAL PRIMARY KEY,
+  id_pps      TEXT NOT NULL REFERENCES guru(id_pps) ON DELETE CASCADE,
+  tanggal     TEXT NOT NULL,
+  status      TEXT NOT NULL CHECK (status IN ('H','A','I','S')),
+  hijri_label TEXT,
+  keterangan  TEXT,
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+
+  CONSTRAINT absensi_id_pps_tanggal_key UNIQUE (id_pps, tanggal)
+);
+
+CREATE INDEX IF NOT EXISTS idx_absensi_tanggal    ON absensi (tanggal);
+CREATE INDEX IF NOT EXISTS idx_absensi_id_pps     ON absensi (id_pps);
+CREATE INDEX IF NOT EXISTS idx_absensi_status     ON absensi (status);
+CREATE INDEX IF NOT EXISTS idx_absensi_created    ON absensi (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_absensi_tgl_status ON absensi (tanggal, status);
+CREATE INDEX IF NOT EXISTS idx_absensi_idpps_tgl  ON absensi (id_pps, tanggal);
+
+
+-- ================================================================
+-- BAGIAN 5 — ROW LEVEL SECURITY (RLS)
+-- ================================================================
+ALTER TABLE guru             ENABLE ROW LEVEL SECURITY;
+ALTER TABLE kalender_hijriah ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sesi_absensi     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE absensi          ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "anon_all_guru"      ON guru;
+DROP POLICY IF EXISTS "anon_all_kalender"  ON kalender_hijriah;
+DROP POLICY IF EXISTS "anon_all_sesi"      ON sesi_absensi;
+DROP POLICY IF EXISTS "anon_all_absensi"   ON absensi;
+
+CREATE POLICY "anon_all_guru"      ON guru             FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "anon_all_kalender"  ON kalender_hijriah FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "anon_all_sesi"      ON sesi_absensi     FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "anon_all_absensi"   ON absensi          FOR ALL TO anon USING (true) WITH CHECK (true);
+
+
+-- ================================================================
+-- BAGIAN 6 — MIGRASI DARI v4.x (jalankan jika database lama)
+-- ================================================================
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sesi_absensi' AND column_name='jam_ke') THEN
+    ALTER TABLE sesi_absensi DROP COLUMN jam_ke;
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='absensi' AND column_name='jam_ke') THEN
+    ALTER TABLE absensi DROP COLUMN jam_ke;
+  END IF;
+END $$;
+
+ALTER TABLE sesi_absensi ADD COLUMN IF NOT EXISTS dibuka_jam        TIMESTAMPTZ;
+ALTER TABLE sesi_absensi ADD COLUMN IF NOT EXISTS jam_offset        BIGINT;
+ALTER TABLE sesi_absensi ADD COLUMN IF NOT EXISTS jam_offset_set_at TIMESTAMPTZ;
+
+ALTER TABLE absensi DROP CONSTRAINT IF EXISTS absensi_id_pps_tanggal_key;
+ALTER TABLE absensi ADD CONSTRAINT absensi_id_pps_tanggal_key UNIQUE (id_pps, tanggal);
+
+
+-- ================================================================
+-- BAGIAN 7 — VERIFIKASI AKHIR
+-- ================================================================
+SELECT table_name, column_name, data_type, is_nullable
+FROM information_schema.columns
+WHERE table_name IN ('guru','kalender_hijriah','sesi_absensi','absensi')
+  AND table_schema = 'public'
+ORDER BY table_name, ordinal_position;
+
+SELECT tablename, rowsecurity FROM pg_tables
+WHERE tablename IN ('guru','kalender_hijriah','sesi_absensi','absensi')
+  AND schemaname = 'public';
+
+SELECT tablename, policyname, cmd, roles FROM pg_policies
+WHERE tablename IN ('guru','kalender_hijriah','sesi_absensi','absensi')
+ORDER BY tablename;
+`;
+  const blob = new Blob([sql], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'supabase_setup_v5.sql';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('✅ File SQL berhasil diunduh!','suc');
+}
+
+// ===== AUTO-REFRESH =====
+function simpanRefresh() {
+  const rd = parseInt(el('st-refresh-dash').value) || 30;
+  const rs = parseInt(el('st-refresh-sesi').value) || 15;
+  saveCfg({ refreshDash: rd, refreshSesi: rs, suara: el('st-suara').checked });
+  // Terapkan langsung
+  window.REFRESH_INTERVAL_OVERRIDE = rd;
+  stopAutoRefresh();
+  if(activePage === 'dashboard') startDashboardRefresh();
+  toast('✅ Pengaturan refresh disimpan!','suc');
+}
+
+// ===== TAMPILAN =====
+let _temaPilihan = 'hijau';
+const TEMA_VARS = {
+  hijau: { tua:'#1a3a2a', mid:'#2d6a4f', muda:'#40916c', terang:'#52b788', emas:'#c9a84c' },
+  biru:  { tua:'#1a2a4a', mid:'#1e3a6e', muda:'#2a5298', terang:'#4a90d9', emas:'#c9a84c' },
+  ungu:  { tua:'#2d1a4a', mid:'#4a2a7a', muda:'#6a3fa8', terang:'#9b6fd4', emas:'#f0d080' },
+  merah: { tua:'#4a1a1a', mid:'#7a2a2a', muda:'#a83f3f', terang:'#d46f6f', emas:'#f0d080' },
+  abu:   { tua:'#2a2a2a', mid:'#3d3d3d', muda:'#555555', terang:'#888888', emas:'#c9a84c' },
+};
+
+function pilihTema(nama, el_) {
+  document.querySelectorAll('.stt-swatch').forEach(s => s.classList.remove('on'));
+  if(el_) el_.classList.add('on');
+  _temaPilihan = nama;
+  terapkanTema(nama);
+}
+
+function terapkanTema(nama) {
+  const t = TEMA_VARS[nama] || TEMA_VARS.hijau;
+  const root = document.documentElement;
+  root.style.setProperty('--hijau-tua',  t.tua);
+  root.style.setProperty('--hijau',      t.mid);
+  root.style.setProperty('--hijau-muda', t.muda);
+  root.style.setProperty('--hijau-terang', t.terang);
+  root.style.setProperty('--emas',       t.emas);
+}
+
+function terapkanDarkMode(aktif) {
+  document.body.classList.toggle('dark-mode', aktif);
+  saveCfg({ darkMode: aktif });
+}
+
+function terapkanFontSize(px) {
+  el('st-fontsize-val').textContent = px + 'px';
+  document.querySelectorAll('td, .sc-val, .sc-lb, .sc-desc, .log-nm, .log-sb').forEach(e => {
+    e.style.fontSize = px + 'px';
+  });
+}
+
+function simpanTampilan() {
+  saveCfg({ tema: _temaPilihan, darkMode: el('st-darkmode').checked, fontSize: parseInt(el('st-fontsize').value) });
+  terapkanTema(_temaPilihan);
+  terapkanDarkMode(el('st-darkmode').checked);
+  terapkanFontSize(el('st-fontsize').value);
+  toast('✅ Tampilan disimpan!','suc');
+}
+
+// ===== ATURAN ABSENSI =====
+function simpanAturanAbsensi() {
+  saveCfg({
+    batasCepat:     parseInt(el('st-batas-cepat').value),
+    batasTepat:     parseInt(el('st-batas-tepat').value),
+    batasLambat:    parseInt(el('st-batas-lambat').value),
+    blokirDuplikat: el('st-blokir-duplikat').checked,
+  });
+  toast('✅ Aturan absensi disimpan!','suc');
+}
+
+// Override fungsi getKategoriKecepatan dengan nilai dari config
+function getKategoriKecepatanDinamis(avgMenit) {
+  const cfg = loadCfg();
+  if(avgMenit === null) return { cls:'pola-abu', label:'📵 Tanpa Data' };
+  if(avgMenit < cfg.batasCepat)  return { cls:'pola-hijau',  label:'⚡ Sangat Cepat' };
+  if(avgMenit < cfg.batasTepat)  return { cls:'pola-biru',   label:'✅ Tepat Waktu' };
+  if(avgMenit < cfg.batasLambat) return { cls:'pola-kuning', label:'⏰ Agak Lambat' };
+  return { cls:'pola-merah', label:'🐢 Sering Telat' };
+}
+
+// ===== LAYAR CHECK-IN =====
+function simpanCheckinSettings() {
+  const cfg = saveCfg({
+    hint:       el('st-hint').value.trim() || CFG_DEFAULT.hint,
+    durasiFb:   parseFloat(el('st-durasi-fb').value) * 1000,
+    showLog:    el('st-show-log').checked,
+    showStats:  el('st-show-stats').checked,
+  });
+  terapkanCheckinSettings(cfg);
+  toast('✅ Pengaturan check-in disimpan!','suc');
+}
+
+function terapkanCheckinSettings(cfg) {
+  const elHint = document.querySelector('.ci-hint');
+  if(elHint) elHint.textContent = cfg.hint;
+  const logCard = document.querySelector('.log-card');
+  if(logCard) logCard.style.display = cfg.showLog ? '' : 'none';
+  const ciSide = document.querySelector('.ci-side');
+  if(ciSide) {
+    const stats = ciSide.querySelectorAll('.ss');
+    stats.forEach(s => s.style.display = cfg.showStats ? '' : 'none');
+  }
+}
+
+// ===== BACKUP & EXPORT =====
+async function backupGuru() {
+  if(!sb) { toast('Supabase belum terhubung!','err'); return; }
+  toast('⏳ Mengambil data guru...','');
+  const { data, error } = await sb.from('guru').select('*').order('nama');
+  if(error) { toast('❌ ' + error.message,'err'); return; }
+  const rows = (data||[]).map((g,i) => [i+1, g.id_pps, g.nama, g.dom||'', g.tingkatan||'']);
+  const ws = XLSX.utils.aoa_to_sheet([['No','ID PPS','Nama','Dom','Tingkatan'], ...rows]);
+  ws['!cols'] = [4,12,24,8,14].map(w=>({wch:w}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Data Guru');
+  XLSX.writeFile(wb, 'Backup_Guru_' + today() + '.xlsx');
+  toast('✅ Export Guru berhasil!','suc');
+}
+
+async function backupAbsensi() {
+  if(!sb) { toast('Supabase belum terhubung!','err'); return; }
+  toast('⏳ Mengambil data absensi...','');
+  const { data, error } = await sb.from('absensi').select('*,guru(nama,dom,tingkatan)').order('created_at', {ascending:false});
+  if(error) { toast('❌ ' + error.message,'err'); return; }
+  const rows = (data||[]).map((a,i) => [
+    i+1, a.id_pps, a.guru?.nama||'', a.guru?.dom||'', a.guru?.tingkatan||'',
+    a.tanggal||'', a.hijri_label||'', a.status||'', a.keterangan||''
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([['No','ID PPS','Nama','Dom','Tingkatan','Tanggal','Tanggal Hijriah','Status','Keterangan'], ...rows]);
+  ws['!cols'] = [4,12,22,8,12,12,18,8,22].map(w=>({wch:w}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Absensi');
+  XLSX.writeFile(wb, 'Backup_Absensi_' + today() + '.xlsx');
+  toast('✅ Export Absensi berhasil!','suc');
+}
+
+async function backupFull() {
+  if(!sb) { toast('Supabase belum terhubung!','err'); return; }
+  toast('⏳ Menyiapkan full backup...','');
+  try {
+    const [rGuru, rAbsensi, rSesi] = await Promise.all([
+      sb.from('guru').select('*').order('nama'),
+      sb.from('absensi').select('*,guru(nama)').order('created_at',{ascending:false}),
+      sb.from('sesi_absensi').select('*').order('created_at',{ascending:false}),
+    ]);
+    const wb = XLSX.utils.book_new();
+    // Sheet Guru
+    const rowsG = (rGuru.data||[]).map((g,i)=>[i+1,g.id_pps,g.nama,g.dom||'',g.tingkatan||'']);
+    const wsG = XLSX.utils.aoa_to_sheet([['No','ID PPS','Nama','Dom','Tingkatan'],...rowsG]);
+    XLSX.utils.book_append_sheet(wb, wsG, 'Guru');
+    // Sheet Absensi
+    const rowsA = (rAbsensi.data||[]).map((a,i)=>[i+1,a.id_pps,a.guru?.nama||'',a.tanggal||'',a.hijri_label||'',a.status||'',a.keterangan||'']);
+    const wsA = XLSX.utils.aoa_to_sheet([['No','ID PPS','Nama','Tanggal','Hijriah','Status','Keterangan'],...rowsA]);
+    XLSX.utils.book_append_sheet(wb, wsA, 'Absensi');
+    // Sheet Sesi
+    const rowsS = (rSesi.data||[]).map((s,i)=>[i+1,s.tanggal_key||'',s.hijri_label||'',s.is_aktif?'Aktif':'Tutup',s.dibuka_pada||'']);
+    const wsS = XLSX.utils.aoa_to_sheet([['No','Tanggal Key','Label Hijriah','Status','Dibuka Pada'],...rowsS]);
+    XLSX.utils.book_append_sheet(wb, wsS, 'Sesi');
+    XLSX.writeFile(wb, 'FullBackup_' + today() + '.xlsx');
+    toast('✅ Full backup berhasil! 3 sheet tersimpan.','suc');
+  } catch(e) { toast('❌ ' + e.message,'err'); }
+}
+
+// ===== KALENDER HIJRIAH =====
+window._hijriOffset = 0;
+function ubahOffsetHijri(delta) {
+  window._hijriOffset = Math.max(-3, Math.min(3, (window._hijriOffset||0) + delta));
+  updateHijriPreview();
+}
+function updateHijriPreview() {
+  const off = window._hijriOffset || 0;
+  el('st-hijri-offset-val').textContent = (off >= 0 ? '+' : '') + off + ' hari';
+  const now = new Date();
+  now.setDate(now.getDate() + off);
+  const h = gregorianToHijri(now.getFullYear(), now.getMonth()+1, now.getDate());
+  el('st-hijri-preview').textContent = hijriLabel(h.day, h.month, h.year);
+}
+function simpanOffsetHijri() {
+  saveCfg({ hijriOffset: window._hijriOffset });
+  toast('✅ Offset Hijriah disimpan! Berlaku pada sesi berikutnya.','suc');
+}
+
+// ===== INISIALISASI SETTINGS SAAT LOAD =====
+function initSettings() {
+  const cfg = loadCfg();
+  terapkanProfil(cfg);
+  if(cfg.darkMode) terapkanDarkMode(true);
+  if(cfg.tema && cfg.tema !== 'hijau') terapkanTema(cfg.tema);
+  if(cfg.fontSize && cfg.fontSize !== 13) {
+    setTimeout(() => terapkanFontSize(cfg.fontSize), 500);
+  }
+  if(cfg.refreshDash) window.REFRESH_INTERVAL_OVERRIDE = cfg.refreshDash;
+  // Terapkan check-in settings
+  setTimeout(() => terapkanCheckinSettings(cfg), 300);
+}
+
+// ===== RESET DATABASE (tambahan dari sebelumnya) =====
+function styleResetLabel() {
+  ['absensi','sesi','kalender','guru'].forEach(k => {
+    const chk = document.getElementById('chk-'+k);
+    const lbl = document.getElementById('lbl-reset-'+k);
+    if(chk && lbl) {
+      lbl.style.borderColor = chk.checked ? '#e74c3c' : '#ddd';
+      lbl.style.background  = chk.checked ? '#fff5f5' : '#fff';
+    }
+  });
+}
+
+function cekKonfirmasiReset() {
+  const val = (document.getElementById('inp-konfirmasi')?.value || '').trim();
+  const btn = document.getElementById('btn-reset-db');
+  const inp = document.getElementById('inp-konfirmasi');
+  if(!btn) return;
+  const adaPilihan = ['absensi','sesi','kalender','guru'].some(k => document.getElementById('chk-'+k)?.checked);
+  const valid = val === 'HAPUS SEMUA' && adaPilihan;
+  btn.disabled = !valid;
+  btn.style.opacity = valid ? '1' : '.45';
+  btn.style.cursor  = valid ? 'pointer' : 'not-allowed';
+  if(inp) inp.style.borderColor = val === 'HAPUS SEMUA' ? '#27ae60' : (val.length > 0 ? '#e74c3c' : '#ddd');
+}
+
+async function resetDatabase() {
+  if(!sb){ toast('Supabase belum terhubung!','err'); return; }
+  const pilihan = {
+    absensi  : document.getElementById('chk-absensi')?.checked,
+    sesi     : document.getElementById('chk-sesi')?.checked,
+    kalender : document.getElementById('chk-kalender')?.checked,
+    guru     : document.getElementById('chk-guru')?.checked,
+  };
+  const namaTabel = [];
+  if(pilihan.absensi)  namaTabel.push('Absensi');
+  if(pilihan.sesi)     namaTabel.push('Sesi Absensi');
+  if(pilihan.kalender) namaTabel.push('Kalender Hijriah');
+  if(pilihan.guru)     namaTabel.push('Data Guru');
+  const konfirmasi = confirm('⚠️ KONFIRMASI TERAKHIR\n\nAnda akan menghapus data berikut secara PERMANEN:\n' + namaTabel.map(t=>'  • '+t).join('\n') + '\n\nTindakan ini TIDAK BISA DIBATALKAN.\nLanjutkan?');
+  if(!konfirmasi) return;
+  const btn = document.getElementById('btn-reset-db');
+  const status = document.getElementById('reset-status');
+  btn.disabled = true; btn.innerHTML = '<div class="loading"></div> Menghapus...';
+  const errors = [], sukses = [];
+  try {
+    if(pilihan.absensi)  { const {error} = await sb.from('absensi').delete().neq('id',0);        if(error) errors.push('absensi: '+error.message); else sukses.push('Absensi'); }
+    if(pilihan.sesi)     { const {error} = await sb.from('sesi_absensi').delete().neq('id',0);   if(error) errors.push('sesi_absensi: '+error.message); else sukses.push('Sesi'); }
+    if(pilihan.kalender) { const {error} = await sb.from('kalender_hijriah').delete().neq('id',0); if(error) errors.push('kalender: '+error.message); else sukses.push('Kalender'); }
+    if(pilihan.guru)     { const {error} = await sb.from('guru').delete().neq('id',0);            if(error) errors.push('guru: '+error.message); else sukses.push('Guru'); }
+    if(pilihan.sesi) { sesiAktif=null; localStorage.removeItem('sesi_absensi'); localStorage.removeItem('sesi_last_setting'); }
+    if(pilihan.guru) { daftarGuru=[]; renderGuru(); }
+    if(pilihan.absensi||pilihan.sesi) { logHariIni=[]; if(typeof renderLog==='function') renderLog(); }
+    document.getElementById('inp-konfirmasi').value='';
+    document.getElementById('inp-konfirmasi').style.borderColor='#ddd';
+    if(errors.length>0) { toast('⚠️ Sebagian gagal: '+errors.join(', '),'err'); if(status){status.textContent='⚠️ '+errors.join(' | ');status.style.color='#e74c3c';} }
+    else { toast('✅ Reset berhasil! Terhapus: '+sukses.join(', '),'suc'); if(status){status.textContent='✅ Berhasil: '+sukses.join(', ');status.style.color='#27ae60';} }
+    await loadGuru(); if(activePage==='dashboard') loadDashboard(); if(pilihan.sesi) renderSesi();
+  } catch(e) { toast('❌ Error: '+e.message,'err'); }
+  finally { btn.disabled=false; btn.innerHTML='🗑 Reset Data Terpilih'; cekKonfirmasiReset(); }
+}
 
 function toast(msg,type=''){
   const t=document.getElementById('toast');
