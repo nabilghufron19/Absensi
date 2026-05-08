@@ -2329,7 +2329,7 @@ async function loadDashboard(){
         return `<div class="dsh-bar-row">
           <span class="dsh-bar-nm">${i+1}. ${g.nama}</span>
           <div class="dsh-bar-bg"><div class="dsh-bar-fill" style="width:${pct}%;background:${color}"></div></div>
-          <span class="dsh-bar-pct" style="color:${color}">${v}${valFn===g=>g.pct?'':'x'}</span>
+          <span class="dsh-bar-pct" style="color:${color}">${v}${typeof v==='number'&&v<=100?'%':'x'}</span>
         </div>`;
       }).join('');
 
