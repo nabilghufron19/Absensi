@@ -582,10 +582,10 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
           <div class="dsh-sub">pertemuan tercatat</div>
         </div>
         <div class="dsh-card purple">
-          <div class="dsh-ic">🏆</div>
-          <div class="dsh-lb">Guru Paling Rajin</div>
+          <div class="dsh-ic">⚡</div>
+          <div class="dsh-lb">Check-in Tercepat</div>
           <div class="dsh-val" id="dsh-best-pct" style="font-size:15px;font-weight:700;line-height:1.3">—</div>
-          <div class="dsh-sub" id="dsh-best-nm">kehadiran tertinggi bulan ini</div>
+          <div class="dsh-sub" id="dsh-best-nm">rata-rata tercepat bulan ini</div>
         </div>
       </div>
 
@@ -652,7 +652,7 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
 
         <!-- Kolom kiri: Top 5 Rajin -->
         <div class="card" style="margin-bottom:0">
-          <div class="ch"><div><div class="ct">🏆 Top 5 Paling Rajin</div><div class="cs" id="dsh-top-rajin-sub">% kehadiran tertinggi bulan ini</div></div></div>
+          <div class="ch"><div><div class="ct">⚡ Top 5 Check-in Tercepat</div><div class="cs" id="dsh-top-rajin-sub">rata-rata menit setelah sesi dibuka</div></div></div>
           <div style="padding:12px 18px" id="dsh-top-rajin">
             <div style="color:var(--abu);font-size:12px;text-align:center;padding:20px 0">Memuat...</div>
           </div>
@@ -1371,70 +1371,17 @@ const CFG_DEFAULT = {
   hijriOffset: 0,
 };
 
-// =============================================
-// CONFIG — HYBRID localStorage + Supabase
-// =============================================
-// Kolom yang TIDAK disinkron ke Supabase (tetap lokal):
-const CFG_LOCAL_ONLY = ['username','passwordHash','password'];
-
 function loadCfg() {
   try { return Object.assign({}, CFG_DEFAULT, JSON.parse(localStorage.getItem('app_cfg') || '{}')); }
   catch(e) { return { ...CFG_DEFAULT }; }
 }
-
 function saveCfg(partial) {
   const cfg = loadCfg();
-  delete cfg.password; // hapus plaintext lama
+  // Jika ada 'password' plaintext yang masih tersimpan dari versi lama, hapus
+  delete cfg.password;
   Object.assign(cfg, partial);
   localStorage.setItem('app_cfg', JSON.stringify(cfg));
-  // Sinkron ke Supabase secara async (non-blocking)
-  _syncCfgToSupabase(cfg);
   return cfg;
-}
-
-// Ambil config dari Supabase dan merge ke localStorage + terapkan ke UI
-async function loadCfgFromSupabase() {
-  if (!sb) return;
-  try {
-    const { data, error } = await sb.from('app_config').select('config').eq('key','global').maybeSingle();
-    if (error || !data) return;
-    const remote = data.config || {};
-    // Jangan timpa field lokal-only dengan nilai dari Supabase
-    CFG_LOCAL_ONLY.forEach(k => delete remote[k]);
-    const local = loadCfg();
-    const merged = Object.assign({}, CFG_DEFAULT, remote, {
-      username:     local.username,
-      passwordHash: local.passwordHash,
-    });
-    localStorage.setItem('app_cfg', JSON.stringify(merged));
-    // Terapkan semua setting yang baru dimuat
-    _terapkanSemuaCfg(merged);
-  } catch(e) { console.warn('loadCfgFromSupabase error:', e.message); }
-}
-
-async function _syncCfgToSupabase(cfg) {
-  if (!sb) return;
-  try {
-    // Buat salinan tanpa field lokal-only
-    const remote = Object.assign({}, cfg);
-    CFG_LOCAL_ONLY.forEach(k => delete remote[k]);
-    await sb.from('app_config').upsert({ key: 'global', config: remote }, { onConflict: 'key' });
-  } catch(e) { console.warn('syncCfgToSupabase error:', e.message); }
-}
-
-function _terapkanSemuaCfg(cfg) {
-  terapkanProfil(cfg);
-  if (cfg.darkMode) terapkanDarkMode(true); else document.body.classList.remove('dark-mode');
-  terapkanTema(cfg.tema || 'hijau');
-  if (cfg.fontSize) setTimeout(() => terapkanFontSize(cfg.fontSize), 300);
-  if (cfg.refreshDash) window.REFRESH_INTERVAL_OVERRIDE = cfg.refreshDash;
-  setTimeout(() => terapkanCheckinSettings(cfg), 300);
-  // Sinkron swatch tema
-  document.querySelectorAll('.stt-swatch').forEach(s => {
-    s.classList.toggle('on', s.dataset.tema === (cfg.tema || 'hijau'));
-  });
-  window._pilihanTema = cfg.tema || 'hijau';
-  window._hijriOffset = cfg.hijriOffset || 0;
 }
 
 // Hash string menggunakan SHA-256, return hex string
@@ -2121,7 +2068,6 @@ async function connect(silent=false){
     document.getElementById('st-badge').className='st-badge ok';
     document.getElementById('st-txt').textContent='Terhubung';
     if(!silent) toast('✅ Berhasil terhubung!','suc');
-    await loadCfgFromSupabase(); // ← muat config dari Supabase & terapkan
     await loadGuru();
     await loadSesi();
     loadDashboard();
@@ -2174,10 +2120,9 @@ async function doCheckin(){
     dibuka_pada: today()
   }, { onConflict: 'tanggal_key', ignoreDuplicates: true });
 
-  // Cek duplikat per hari (sesuai config blokirDuplikat)
+  // Cek duplikat per hari
   const {data:exist}=await sb.from('absensi').select('id,status').eq('id_pps',idpps).eq('tanggal',tgl).maybeSingle();
-  const cfg = loadCfg();
-  if(exist && cfg.blokirDuplikat !== false){
+  if(exist){
     const lbl={H:'Hadir',A:'Alpha',I:'Izin',S:'Sakit'};
     showFb('err',guru.nama,guru.dom+' · '+guru.tingkatan,'sudah');
     document.getElementById('fb-dt').textContent = `Sudah tercatat ${lbl[exist.status]||exist.status} di sesi ini`;
@@ -2338,19 +2283,34 @@ async function loadDashboard(){
   const jmlSesi  = tglBulan.length;
   _set('dsh-jml-sesi', jmlSesi || '0');
 
+  // Ambil juga sesi_absensi bulan ini untuk data dibuka_jam (perlu hitung kecepatan)
+  const {data:sesiListBulan} = await sb.from('sesi_absensi')
+    .select('tanggal_key, dibuka_jam, created_at')
+    .in('tanggal_key', tglBulan.length>0 ? tglBulan : ['__none__']);
+  const sesiMapBulan = {};
+  (sesiListBulan||[]).forEach(s=>{
+    sesiMapBulan[s.tanggal_key] = s.dibuka_jam || s.created_at || null;
+  });
+
   let blnH=0,blnA=0,blnI=0,blnS=0;
-  let perGuruBulan = {}; // id_pps -> {H,A,I,S,nama,dom}
+  let perGuruBulan = {}; // id_pps -> {H,A,I,S,nama,dom,selisihList}
   if(tglBulan.length>0){
     const {data:dBulan} = await sb.from('absensi')
-      .select('id_pps,status,guru(nama,dom)')
+      .select('id_pps,status,tanggal,created_at,guru(nama,dom)')
       .in('tanggal', tglBulan);
     (dBulan||[]).forEach(a=>{
       if(a.status==='H') blnH++;
       else if(a.status==='A') blnA++;
       else if(a.status==='I') blnI++;
       else if(a.status==='S') blnS++;
-      if(!perGuruBulan[a.id_pps]) perGuruBulan[a.id_pps]={H:0,A:0,I:0,S:0,nama:a.guru?.nama||a.id_pps,dom:a.guru?.dom||'—'};
+      if(!perGuruBulan[a.id_pps]) perGuruBulan[a.id_pps]={H:0,A:0,I:0,S:0,nama:a.guru?.nama||a.id_pps,dom:a.guru?.dom||'—',selisihList:[]};
       perGuruBulan[a.id_pps][a.status]++;
+      // Kumpulkan data kecepatan check-in untuk guru yang hadir
+      if(a.status==='H'){
+        const tsDibuka = sesiMapBulan[a.tanggal];
+        const mnt = selisihMenit(tsDibuka, a.created_at);
+        if(mnt !== null) perGuruBulan[a.id_pps].selisihList.push(mnt);
+      }
     });
   }
   const totBulan = blnH+blnA+blnI+blnS;
@@ -2367,47 +2327,82 @@ async function loadDashboard(){
   const blnNama = ['','Muharram','Shafar','Rabi\'ul Awwal','Rabi\'ul Akhir','Jumadal Ula','Jumadal Akhirah','Rajab','Sya\'ban','Ramadhan','Syawwal','Dzulqadah','Dzulhijjah'];
   _set('dsh-rekap-sub', (blnNama[hh.month]||'Bulan ini')+' '+hh.year+' H · '+jmlSesi+' sesi');
 
-  // ── 4. Top 5 rajin (% hadir) & Top 5 alpha ──────────────────────────
+  // ── 4. Top 5 check-in tercepat & Top 5 alpha ──────────────────────────
   const guruArr = Object.values(perGuruBulan);
   // Tambah guru yang 0 absensi
   daftarGuru.forEach(g=>{
-    if(!perGuruBulan[g.id_pps]) guruArr.push({H:0,A:0,I:0,S:0,nama:g.nama,dom:g.dom||'—',id_pps:g.id_pps});
+    if(!perGuruBulan[g.id_pps]) guruArr.push({H:0,A:0,I:0,S:0,nama:g.nama,dom:g.dom||'—',id_pps:g.id_pps,selisihList:[]});
   });
-  guruArr.forEach(g=>{ g.tot=g.H+g.A+g.I+g.S; g.pct=g.tot>0?Math.round(g.H/g.tot*100):0; });
+  guruArr.forEach(g=>{
+    g.tot = g.H+g.A+g.I+g.S;
+    g.pct = g.tot>0 ? Math.round(g.H/g.tot*100) : 0;
+    g.avgMenit = g.selisihList && g.selisihList.length>0
+      ? Math.round(g.selisihList.reduce((a,b)=>a+b,0)/g.selisihList.length)
+      : null;
+  });
 
-  // Top 5 rajin = % hadir tertinggi, tie-break: jumlah H terbanyak
+  // Top 5 tercepat = avgMenit terkecil (harus punya data kecepatan dan minimal 1x hadir)
+  // Tie-break: % hadir lebih tinggi lebih baik
   const top5Rajin = [...guruArr]
-    .filter(g=>g.tot>0)
-    .sort((a,b)=>b.pct-a.pct || b.H-a.H)
+    .filter(g => g.avgMenit !== null && g.H > 0)
+    .sort((a,b) => a.avgMenit - b.avgMenit || b.pct - a.pct)
     .slice(0,5);
+
+  // Fallback: jika tidak ada data kecepatan sama sekali, pakai % hadir
+  const pakaiKecepatan = top5Rajin.length > 0;
+  const top5Fallback = !pakaiKecepatan
+    ? [...guruArr].filter(g=>g.tot>0).sort((a,b)=>b.pct-a.pct||b.H-a.H).slice(0,5)
+    : [];
 
   const top5Alpha = [...guruArr].filter(g=>g.A>0).sort((a,b)=>b.A-a.A).slice(0,5);
 
-  // Best guru untuk header card purple
+  // Best guru untuk header card purple — selalu berbasis kecepatan
   if(top5Rajin.length>0){
     const best = top5Rajin[0];
-    _set('dsh-best-pct', best.pct+'%  (' + best.H + '/' + (best.tot||1) + 'x hadir)');
-    _set('dsh-best-nm', best.nama);
+    _set('dsh-best-pct', fmtMenit(best.avgMenit) + ' rata-rata');
+    _set('dsh-best-nm', best.nama + ' · ' + best.H + 'x hadir');
+  } else if(top5Fallback.length>0){
+    const best = top5Fallback[0];
+    _set('dsh-best-pct', best.pct+'% hadir');
+    _set('dsh-best-nm', best.nama + ' (data waktu belum tersedia)');
   }
 
-  // Update subtitle Top 5 Rajin
+  // Update subtitle Top 5
   const rSub = document.getElementById('dsh-top-rajin-sub');
-  if(rSub) rSub.textContent = jmlSesi>0 ? '% kehadiran dari ' + jmlSesi + ' sesi bulan ini' : '% kehadiran tertinggi bulan ini';
+  if(rSub) rSub.textContent = pakaiKecepatan
+    ? 'rata-rata menit check-in setelah sesi dibuka · ' + jmlSesi + ' sesi'
+    : '⚠️ Data waktu belum tersedia — menampilkan % kehadiran';
 
-  const rankClass = i => i===0?'r1':i===1?'r2':i===2?'r3':'rn';
-  const rankIcon  = i => i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+  const rankIcon = i => i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
 
+  // Render daftar — berbasis kecepatan jika ada, fallback ke % hadir
   const rEl=document.getElementById('dsh-top-rajin');
-  if(rEl) rEl.innerHTML = top5Rajin.length===0
+  const listToRender = pakaiKecepatan ? top5Rajin : top5Fallback;
+  if(rEl) rEl.innerHTML = listToRender.length===0
     ? '<div style="color:var(--abu);font-size:12px;text-align:center;padding:16px 0">Belum ada data bulan ini</div>'
-    : top5Rajin.map((g,i)=>{
-        const color=g.pct>=80?'#2e7d32':g.pct>=60?'#ffa726':'#ef5350';
-        return `<div class="dsh-bar-row">
-          <span style="font-size:15px;min-width:22px;text-align:center">${rankIcon(i)||('<span class="rank-badge rn" style="font-size:9px">'+(i+1)+'</span>')}</span>
-          <span class="dsh-bar-nm" style="flex:1">${g.nama}</span>
-          <div class="dsh-bar-bg" style="flex:0 0 70px"><div class="dsh-bar-fill" style="width:${g.pct}%;background:${color}"></div></div>
-          <span class="dsh-bar-pct" style="color:${color};min-width:38px">${g.pct}%</span>
-        </div>`;
+    : listToRender.map((g,i)=>{
+        if(pakaiKecepatan){
+          // Bar = makin kecil makin baik; normalkan ke guru tercepat
+          const maxMnt = listToRender[listToRender.length-1].avgMenit || 1;
+          const minMnt = listToRender[0].avgMenit || 0;
+          // Bar penuh untuk tercepat, makin ke bawah makin pendek
+          const barPct = maxMnt === minMnt ? 100 : Math.round((1 - (g.avgMenit - minMnt)/(maxMnt - minMnt)) * 80 + 20);
+          const color = g.avgMenit<5?'#2e7d32':g.avgMenit<15?'#1565c0':g.avgMenit<30?'#e65100':'#c62828';
+          return `<div class="dsh-bar-row">
+            <span style="font-size:15px;min-width:22px;text-align:center">${rankIcon(i)||('<span class="rank-badge rn" style="font-size:9px">'+(i+1)+'</span>')}</span>
+            <span class="dsh-bar-nm" style="flex:1">${g.nama}</span>
+            <div class="dsh-bar-bg" style="flex:0 0 70px"><div class="dsh-bar-fill" style="width:${barPct}%;background:${color}"></div></div>
+            <span class="dsh-bar-pct" style="color:${color};min-width:48px;font-size:11px">${fmtMenit(g.avgMenit)}</span>
+          </div>`;
+        } else {
+          const color=g.pct>=80?'#2e7d32':g.pct>=60?'#ffa726':'#ef5350';
+          return `<div class="dsh-bar-row">
+            <span style="font-size:15px;min-width:22px;text-align:center">${rankIcon(i)||('<span class="rank-badge rn" style="font-size:9px">'+(i+1)+'</span>')}</span>
+            <span class="dsh-bar-nm" style="flex:1">${g.nama}</span>
+            <div class="dsh-bar-bg" style="flex:0 0 70px"><div class="dsh-bar-fill" style="width:${g.pct}%;background:${color}"></div></div>
+            <span class="dsh-bar-pct" style="color:${color};min-width:38px">${g.pct}%</span>
+          </div>`;
+        }
       }).join('');
 
   const aEl=document.getElementById('dsh-top-alpha');
@@ -2968,15 +2963,11 @@ function fmtMenit(m) {
 }
 
 function getKategoriKecepatan(avgMenit) {
-  const cfg = loadCfg();
-  const batasCepat  = cfg.batasCepat  || 5;
-  const batasTepat  = cfg.batasTepat  || 15;
-  const batasLambat = cfg.batasLambat || 30;
   if(avgMenit === null) return {label:'📵 Tanpa Data', cls:'pola-abu', score:0};
-  if(avgMenit < batasCepat)  return {label:'⚡ Sangat Cepat', cls:'pola-hijau', score:4};
-  if(avgMenit < batasTepat)  return {label:'✅ Tepat Waktu',  cls:'pola-biru',  score:3};
-  if(avgMenit < batasLambat) return {label:'⏰ Agak Lambat',  cls:'pola-kuning',score:2};
-  return                            {label:'🐢 Sering Telat', cls:'pola-merah', score:1};
+  if(avgMenit <  5)    return {label:'⚡ Sangat Cepat', cls:'pola-hijau', score:4};
+  if(avgMenit < 15)    return {label:'✅ Tepat Waktu',  cls:'pola-biru',  score:3};
+  if(avgMenit < 30)    return {label:'⏰ Agak Lambat',  cls:'pola-kuning',score:2};
+  return                      {label:'🐢 Sering Telat', cls:'pola-merah', score:1};
 }
 
 async function loadAnalisa(){
@@ -3370,7 +3361,7 @@ function simpanProfil() {
     versi:        el('st-versi').value.trim()         || CFG_DEFAULT.versi,
   });
   terapkanProfil(cfg);
-  toast('✅ Profil disimpan & disinkron ke semua perangkat!','suc');
+  toast('✅ Profil madrasah disimpan!','suc');
 }
 
 function terapkanProfil(cfg) {
@@ -3581,7 +3572,7 @@ function simpanRefresh() {
   window.REFRESH_INTERVAL_OVERRIDE = rd;
   stopAutoRefresh();
   if(activePage === 'dashboard') startDashboardRefresh();
-  toast('✅ Pengaturan refresh disimpan & disinkron!','suc');
+  toast('✅ Pengaturan refresh disimpan!','suc');
 }
 
 // ===== TAMPILAN =====
@@ -3628,7 +3619,7 @@ function simpanTampilan() {
   terapkanTema(_temaPilihan);
   terapkanDarkMode(el('st-darkmode').checked);
   terapkanFontSize(el('st-fontsize').value);
-  toast('✅ Tampilan disimpan & disinkron ke semua perangkat!','suc');
+  toast('✅ Tampilan disimpan!','suc');
 }
 
 // ===== ATURAN ABSENSI =====
@@ -3639,9 +3630,18 @@ function simpanAturanAbsensi() {
     batasLambat:    parseInt(el('st-batas-lambat').value),
     blokirDuplikat: el('st-blokir-duplikat').checked,
   });
-  toast('✅ Aturan absensi disimpan & disinkron ke semua perangkat!','suc');
+  toast('✅ Aturan absensi disimpan!','suc');
 }
 
+// Override fungsi getKategoriKecepatan dengan nilai dari config
+function getKategoriKecepatanDinamis(avgMenit) {
+  const cfg = loadCfg();
+  if(avgMenit === null) return { cls:'pola-abu', label:'📵 Tanpa Data' };
+  if(avgMenit < cfg.batasCepat)  return { cls:'pola-hijau',  label:'⚡ Sangat Cepat' };
+  if(avgMenit < cfg.batasTepat)  return { cls:'pola-biru',   label:'✅ Tepat Waktu' };
+  if(avgMenit < cfg.batasLambat) return { cls:'pola-kuning', label:'⏰ Agak Lambat' };
+  return { cls:'pola-merah', label:'🐢 Sering Telat' };
+}
 
 // ===== LAYAR CHECK-IN =====
 function simpanCheckinSettings() {
@@ -3652,7 +3652,7 @@ function simpanCheckinSettings() {
     showStats:  el('st-show-stats').checked,
   });
   terapkanCheckinSettings(cfg);
-  toast('✅ Pengaturan check-in disimpan & disinkron!','suc');
+  toast('✅ Pengaturan check-in disimpan!','suc');
 }
 
 function terapkanCheckinSettings(cfg) {
@@ -3742,14 +3742,21 @@ function updateHijriPreview() {
 }
 function simpanOffsetHijri() {
   saveCfg({ hijriOffset: window._hijriOffset });
-  toast('✅ Offset Hijriah disimpan & disinkron ke semua perangkat.','suc');
+  toast('✅ Offset Hijriah disimpan! Berlaku pada sesi berikutnya.','suc');
 }
 
 // ===== INISIALISASI SETTINGS SAAT LOAD =====
 function initSettings() {
-  // Terapkan config dari localStorage dulu (offline-first),
-  // lalu loadCfgFromSupabase() dipanggil setelah connect berhasil untuk override dengan nilai terbaru
-  _terapkanSemuaCfg(loadCfg());
+  const cfg = loadCfg();
+  terapkanProfil(cfg);
+  if(cfg.darkMode) terapkanDarkMode(true);
+  if(cfg.tema && cfg.tema !== 'hijau') terapkanTema(cfg.tema);
+  if(cfg.fontSize && cfg.fontSize !== 13) {
+    setTimeout(() => terapkanFontSize(cfg.fontSize), 500);
+  }
+  if(cfg.refreshDash) window.REFRESH_INTERVAL_OVERRIDE = cfg.refreshDash;
+  // Terapkan check-in settings
+  setTimeout(() => terapkanCheckinSettings(cfg), 300);
 }
 
 // ===== RESET DATABASE (tambahan dari sebelumnya) =====
