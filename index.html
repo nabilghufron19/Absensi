@@ -1906,7 +1906,7 @@ async function bukaSesi() {
 
   // Buka sesi baru di Supabase — simpan dibuka_jam (timestamptz) untuk analisa ketepatan
   const dibuka_jam = new Date().toISOString();
-  const { data: sesiBaru, error: sesiErr } = await sb.from('sesi_absensi').upsert({
+  const { error: sesiErr } = await sb.from('sesi_absensi').upsert({
     tanggal_key: tglKey,
     hijri_label: label,
     hijri_day: hd, hijri_month: hm, hijri_year: hy,
