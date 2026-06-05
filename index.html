@@ -5,7 +5,142 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Absensi Guru — Idadiyah al-Miftah</title>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Neon proxy wrapper — menggantikan Supabase JS client -->
+<script>
+// =====================================================================
+// NEON PROXY WRAPPER
+// Meniru interface Supabase JS agar tidak perlu mengubah kode lainnya.
+// Semua query diteruskan ke Cloudflare Worker (worker.js) yang terhubung
+// ke Neon via @neondatabase/serverless.
+// =====================================================================
+window.__neonProxyUrl = '/api/db'; // sesuaikan jika worker di-deploy ke URL lain
+
+function createNeonClient(proxyUrl) {
+  function buildClient() {
+    // Query builder yang meniru sb.from('table').select/insert/update/delete/upsert
+    function QueryBuilder(table) {
+      this._table  = table;
+      this._op     = null;   // 'select'|'insert'|'update'|'delete'|'upsert'
+      this._data   = null;
+      this._filters = [];    // [{type, col, val}]
+      this._order  = null;   // {col, asc}
+      this._limit  = null;
+      this._single = false;
+      this._maybeSingle = false;
+      this._ignoreDuplicates = false;
+      this._onConflict = null;
+      this._selectCols = '*';
+      this._inVals    = null;
+      this._returning = true;
+    }
+
+    QueryBuilder.prototype.select = function(cols) {
+      this._op = 'select';
+      this._selectCols = cols || '*';
+      return this;
+    };
+    QueryBuilder.prototype.insert = function(data) {
+      this._op = 'insert';
+      this._data = data;
+      return this;
+    };
+    QueryBuilder.prototype.update = function(data) {
+      this._op = 'update';
+      this._data = data;
+      return this;
+    };
+    QueryBuilder.prototype.delete = function() {
+      this._op = 'delete';
+      return this;
+    };
+    QueryBuilder.prototype.upsert = function(data, opts) {
+      this._op = 'upsert';
+      this._data = data;
+      if (opts) {
+        if (opts.onConflict)       this._onConflict = opts.onConflict;
+        if (opts.ignoreDuplicates) this._ignoreDuplicates = true;
+      }
+      return this;
+    };
+    QueryBuilder.prototype.eq = function(col, val) {
+      this._filters.push({ type:'eq', col, val });
+      return this;
+    };
+    QueryBuilder.prototype.neq = function(col, val) {
+      this._filters.push({ type:'neq', col, val });
+      return this;
+    };
+    QueryBuilder.prototype.in = function(col, vals) {
+      this._inVals = { col, vals };
+      return this;
+    };
+    QueryBuilder.prototype.order = function(col, opts) {
+      this._order = { col, asc: opts ? (opts.ascending !== false) : true };
+      return this;
+    };
+    QueryBuilder.prototype.limit = function(n) {
+      this._limit = n;
+      return this;
+    };
+    QueryBuilder.prototype.single = function() {
+      this._single = true;
+      return this;
+    };
+    QueryBuilder.prototype.maybeSingle = function() {
+      this._maybeSingle = true;
+      return this;
+    };
+
+    // Eksekusi query — mengirim payload ke Cloudflare Worker
+    QueryBuilder.prototype.then = function(resolve, reject) {
+      return this._exec().then(resolve, reject);
+    };
+    QueryBuilder.prototype.catch = function(reject) {
+      return this._exec().catch(reject);
+    };
+    QueryBuilder.prototype._exec = async function() {
+      const payload = {
+        table:          this._table,
+        op:             this._op,
+        data:           this._data,
+        filters:        this._filters,
+        order:          this._order,
+        limit:          this._limit,
+        single:         this._single,
+        maybeSingle:    this._maybeSingle,
+        ignoreDuplicates: this._ignoreDuplicates,
+        onConflict:     this._onConflict,
+        selectCols:     this._selectCols,
+        inVals:         this._inVals,
+      };
+      try {
+        const res = await fetch(proxyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        if (!res.ok) return { data: null, error: { message: json.error || 'Server error' } };
+        return { data: json.data, error: null };
+      } catch(e) {
+        return { data: null, error: { message: e.message } };
+      }
+    };
+
+    return {
+      from(table) {
+        return new QueryBuilder(table);
+      }
+    };
+  }
+
+  return { createClient: () => buildClient() };
+}
+
+// Expose sebagai global `supabase` agar kode yang pakai
+// const {createClient} = supabase  tetap bekerja tanpa perubahan
+window.supabase = createNeonClient(window.__neonProxyUrl);
+</script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root {
@@ -868,7 +1003,7 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
           <div id="prev-wrap" style="display:none;margin-top:22px">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px">
               <div class="ct">&#128065;&#65039; Preview: <span id="prev-count">0</span> guru</div>
-              <button class="btn btn-g" onclick="importGuru()" id="btn-import">&#11014;&#65039; Simpan Perubahan ke Supabase</button>
+              <button class="btn btn-g" onclick="importGuru()" id="btn-import">&#11014;&#65039; Simpan Perubahan ke Neon</button>
             </div>
             <div id="prev-ringkasan"></div>
             <div class="table-wrap">
@@ -881,11 +1016,11 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
       <!-- RESET DATA -->
       <div class="card" style="margin-top:18px;border:2px solid #fce4ec">
         <div class="ch" style="background:#fff5f5">
-          <div><div class="ct" style="color:#c0392b">⚠️ Zona Berbahaya — Reset Data Supabase</div><div class="cs">Hapus seluruh data dari database. Tidak bisa dibatalkan.</div></div>
+          <div><div class="ct" style="color:#c0392b">⚠️ Zona Berbahaya — Reset Data Neon</div><div class="cs">Hapus seluruh data dari database. Tidak bisa dibatalkan.</div></div>
         </div>
         <div style="padding:20px 22px">
           <div style="background:#fce4ec;border:1px solid #f5b7b1;border-radius:10px;padding:12px 15px;margin-bottom:16px;font-size:13px;color:#922b21;line-height:1.7">
-            ⚠️ <strong>Peringatan:</strong> Reset menghapus semua data Supabase secara permanen. Pastikan sudah backup!
+            ⚠️ <strong>Peringatan:</strong> Reset menghapus semua data Neon secara permanen. Pastikan sudah backup!
           </div>
           <div style="margin-bottom:14px;display:flex;flex-direction:column;gap:7px">
             <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:9px 13px;background:#fff;border:1.5px solid #ddd;border-radius:8px" id="lbl-reset-absensi">
@@ -1031,7 +1166,7 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
       <div class="stt-nav">
         <button class="stt-ni on" onclick="sttGo('akun',this)"><span class="ic">🔐</span>Keamanan</button>
         <button class="stt-ni" onclick="sttGo('profil',this)"><span class="ic">🏫</span>Profil Madrasah</button>
-        <button class="stt-ni" onclick="sttGo('koneksi',this)"><span class="ic">🔌</span>Koneksi Supabase</button>
+        <button class="stt-ni" onclick="sttGo('koneksi',this)"><span class="ic">🔌</span>Koneksi Neon</button>
         <button class="stt-ni" onclick="sttGo('refresh',this)"><span class="ic">🔄</span>Auto-Refresh</button>
         <button class="stt-ni" onclick="sttGo('tampilan',this)"><span class="ic">🎨</span>Tampilan</button>
         <button class="stt-ni" onclick="sttGo('absensi',this)"><span class="ic">📋</span>Aturan Absensi</button>
@@ -1111,7 +1246,7 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
 
         <!-- ===== KONEKSI SUPABASE ===== -->
         <div class="stt-section" id="stt-koneksi">
-          <div class="stt-sec-title">🔌 Koneksi Supabase</div>
+          <div class="stt-sec-title">🔌 Koneksi Neon</div>
           <div class="stt-sec-sub">Status dan informasi koneksi database</div>
           <div class="stt-group">
             <div class="stt-row">
@@ -1119,7 +1254,7 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
               <span id="st-conn-status" class="stt-conn-status no">⚫ Belum diuji</span>
             </div>
             <div class="stt-row">
-              <div><div class="stt-row-label">Supabase URL</div><div class="stt-row-desc">Tersimpan langsung di file HTML</div></div>
+              <div><div class="stt-row-label">Neon Proxy URL</div><div class="stt-row-desc">Tersimpan langsung di file HTML</div></div>
               <span id="st-sb-url-display" style="font-size:12px;color:var(--abu);font-family:monospace;word-break:break-all;max-width:240px;text-align:right">—</span>
             </div>
             <div class="stt-row" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
@@ -1265,7 +1400,7 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
         <!-- ===== BACKUP & EXPORT ===== -->
         <div class="stt-section" id="stt-backup">
           <div class="stt-sec-title">💾 Backup & Export</div>
-          <div class="stt-sec-sub">Ekspor seluruh data sekaligus dari Supabase</div>
+          <div class="stt-sec-sub">Ekspor seluruh data sekaligus dari Neon</div>
           <div class="stt-group">
             <div class="stt-row">
               <div><div class="stt-row-label">Export Semua Data Guru</div><div class="stt-row-desc">Download daftar guru ke Excel</div></div>
@@ -1315,14 +1450,14 @@ code{font-size:11.5px;background:#f5f5f5;padding:2px 6px;border-radius:4px;font-
             <div class="stt-row"><div class="stt-row-label">Developer</div><span style="font-size:13px;color:var(--abu)" id="inf-dev">Nabil Ghufron</span></div>
             <div class="stt-row"><div class="stt-row-label">Madrasah</div><span style="font-size:13px;color:var(--abu)" id="inf-madrasah">Tarbiyah Idadiyah al-Miftah</span></div>
             <div class="stt-row">
-              <div class="stt-row-label">Status Supabase</div>
-              <span id="inf-supabase" class="stt-conn-status no">⚫ Tidak Terhubung</span>
+              <div class="stt-row-label">Status Neon</div>
+              <span id="inf-neon" class="stt-conn-status no">⚫ Tidak Terhubung</span>
             </div>
             <div class="stt-row"><div class="stt-row-label">Tanggal Akses</div><span style="font-size:13px;color:var(--abu)" id="inf-tanggal">—</span></div>
           </div>
           <div class="stt-group">
             <div class="stt-row">
-              <div><div class="stt-row-label">Download SQL Setup</div><div class="stt-row-desc">Script SQL untuk setup tabel Supabase dari awal</div></div>
+              <div><div class="stt-row-label">Download SQL Setup</div><div class="stt-row-desc">Script SQL untuk setup tabel Neon dari awal</div></div>
               <button class="stt-btn-save" onclick="downloadSQL()" style="background:#1565c0">📥 Download .sql</button>
             </div>
           </div>
@@ -1511,18 +1646,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 });
 
-// ===== SUPABASE CONFIG =====
-// ⚠️ PENTING: Aktifkan Row Level Security (RLS) di semua tabel Supabase Anda!
-// Tabel yang perlu RLS: guru, absensi, kalender_hijriah, sesi_absensi
-// Key anon ini aman selama RLS dikonfigurasi dengan benar.
-//
-// Format tanggal_key: H-YYYY-MM-DD (1 sesi per hari, tanpa jam_ke)
-// kalender_hijriah.tanggal_sesi = H-YYYY-MM-DD (sama dengan tanggal_key)
-//
-// SQL untuk membuat tabel (jalankan sekali di Supabase SQL Editor) — lihat file SQL terpisah.
-// ══════════════════════════════════════════════════════════════
-const SB_URL = 'https://rttcqjfvpcpdxodfwzeo.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0dGNxamZ2cGNwZHhvZGZ3emVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0OTAwMjEsImV4cCI6MjA5MzA2NjAyMX0.F3CmOnIgbwRNaUIGs7zO2-HQ0Wln8xqgw0BnhcS3GM8';
+// ===== NEON CONFIG =====
+// Semua query diteruskan ke Cloudflare Worker di /api/db
+// Worker membaca DATABASE_URL dari secret (NEON_DATABASE_URL)
+// SQL setup tabel: lihat file neon_setup.sql
+// ═══════════════════════════════════════════════════════════
+const SB_URL = '/api/db'; // dipakai hanya untuk tampilan di Settings
+const SB_KEY = '';        // tidak dipakai, keamanan ada di Worker
 
 // ===== KONSTANTA =====
 const BLN_H = ['','Muharram','Shafar','Rabiul Awwal','Rabiul Akhir','Jumadal Ula','Jumadal Akhirah','Rajab','Syaban','Ramadhan','Syawwal','Dzulqadah','Dzulhijjah'];
@@ -1540,7 +1670,7 @@ const REFRESH_INTERVAL = 30; // detik
 let dashRefreshTimer = null;
 let dashCountdown = REFRESH_INTERVAL;
 let checkinRefreshTimer = null;
-let sesiPollTimer = null;       // polling sesi dari Supabase
+let sesiPollTimer = null;       // polling sesi dari Neon
 let activePage = 'dashboard';
 
 // ===== SIDEBAR TOGGLE =====
@@ -1633,7 +1763,7 @@ function namaHariFromMasehi(tglStr) {
 
 async function loadSesi() {
   if (!sb) {
-    // Fallback ke localStorage jika Supabase belum siap
+    // Fallback ke localStorage jika Neon belum siap
     try { sesiAktif = JSON.parse(localStorage.getItem('sesi_absensi')||'null'); } catch(e){ sesiAktif=null; }
     renderSesi(); return;
   }
@@ -1650,7 +1780,7 @@ async function loadSesi() {
     // Sync ke localStorage sebagai cache offline
     if (sesiAktif) localStorage.setItem('sesi_absensi', JSON.stringify(sesiAktif));
     else localStorage.removeItem('sesi_absensi');
-    // Terapkan jam_offset dari Supabase jika ada (sinkron antar perangkat)
+    // Terapkan jam_offset dari Neon jika ada (sinkron antar perangkat)
     if (sesiAktif && sesiAktif.jam_offset !== null && sesiAktif.jam_offset !== undefined) {
       const setAt = sesiAktif.jam_offset_set_at ? new Date(sesiAktif.jam_offset_set_at).getTime() : null;
       if (setAt) {
@@ -1671,7 +1801,7 @@ async function loadSesi() {
   renderSesi();
 }
 
-// Poll sesi dari Supabase tiap 15 detik (supaya perangkat lain ikut ter-update)
+// Poll sesi dari Neon tiap 15 detik (supaya perangkat lain ikut ter-update)
 function startSesiPoll() {
   if (sesiPollTimer) clearInterval(sesiPollTimer);
   sesiPollTimer = setInterval(async () => {
@@ -1688,7 +1818,7 @@ function startSesiPoll() {
       if (sekarang) toast('🔄 Sesi diperbarui: ' + sesiAktif.hijri_label, '');
       else toast('🔒 Sesi telah ditutup dari perangkat lain.', '');
     }
-    // Sinkronkan jam_offset dari Supabase ke semua perangkat
+    // Sinkronkan jam_offset dari Neon ke semua perangkat
     if (sesiAktif) {
       const offsetBaru = sesiAktif.jam_offset;
       if (offsetBaru !== offsetSebelumnya) {
@@ -1762,7 +1892,7 @@ function buildBukaSesiForm() {
 }
 
 async function bukaSesi() {
-  if(!sb){ toast('Supabase belum terhubung!','err'); return; }
+  if(!sb){ toast('Neon belum terhubung!','err'); return; }
   const hd = parseInt(document.getElementById('inp-hd').value)||1;
   const hm = parseInt(document.getElementById('inp-hm').value)||1;
   const hy = parseInt(document.getElementById('inp-hy').value)||1446;
@@ -1909,7 +2039,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }
   });
 
-  // Terapkan jam dari input — disimpan ke Supabase agar sinkron semua perangkat
+  // Terapkan jam dari input — disimpan ke Neon agar sinkron semua perangkat
   window.terapkanJamManual = async function() {
     const h = parseInt(document.getElementById('cjp-h').value) || 0;
     const m = parseInt(document.getElementById('cjp-m').value) || 0;
@@ -1950,7 +2080,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(btn) btn.classList.remove('active');
   };
 
-  // Reset ke jam sistem — hapus offset dari Supabase agar sinkron semua perangkat
+  // Reset ke jam sistem — hapus offset dari Neon agar sinkron semua perangkat
   window.resetJamOtomatis = async function() {
     manualOffset = null;
     setJamModeBadge('otomatis');
@@ -2013,7 +2143,7 @@ function go(nama, btn){
     document.getElementById('ci-inp').focus();
     updateSideStats();
     startCheckinRefresh();
-    startSesiPoll();   // polling sesi dari Supabase
+    startSesiPoll();   // polling sesi dari Neon
   } else {
     if(sesiPollTimer){ clearInterval(sesiPollTimer); sesiPollTimer=null; }
   }
@@ -2078,7 +2208,7 @@ async function connect(silent=false){
     document.getElementById('st-badge').className='st-badge no';
     document.getElementById('st-txt').textContent='Gagal: '+e.message;
     if(!silent) toast('❌ '+e.message,'err');
-    console.error('Supabase connect error:', e);
+    console.error('Neon connect error:', e);
   }
 }
 
@@ -2097,7 +2227,7 @@ async function loadGuru(){
 async function doCheckin(){
   const inp=document.getElementById('ci-inp');
   const idpps=inp.value.trim(); if(!idpps) return;
-  if(!sb){ showFb('err','Koneksi Error','Supabase belum terhubung','notfound'); inp.value=''; return; }
+  if(!sb){ showFb('err','Koneksi Error','Neon belum terhubung','notfound'); inp.value=''; return; }
   if(!sesiAktif){ showFb('err','⚠️ Sesi Belum Dibuka','Buka sesi absensi dulu di atas!','notfound'); inp.value=''; setTimeout(clearFb,3500); return; }
 
   const guru=daftarGuru.find(g=>String(g.id_pps)===idpps);
@@ -2487,7 +2617,7 @@ async function loadDashboard(){
 
 // ===== REKAP BULANAN — 1 SESI PER HARI =====
 async function loadRekap(){
-  if(!sb){ toast('Hubungkan Supabase!','err'); return; }
+  if(!sb){ toast('Hubungkan Neon!','err'); return; }
   const hBulan = parseInt(document.getElementById('f-bulan-hijri').value);
   const hTahun = parseInt(document.getElementById('f-tahun-hijri').value);
   const bulanLabel = BLN_H[hBulan] + ' ' + hTahun + ' H';
@@ -2719,7 +2849,7 @@ function editRekapStatus(idpps, tanggalKey, status, el) {
   sel.onchange = async ()=>{
     const newStatus = sel.value;
     sel.remove();
-    if(!window.sb){ toast('Supabase belum siap','err'); return; }
+    if(!window.sb){ toast('Neon belum siap','err'); return; }
     // Cari hijri_label dari rekapHariArr
     let hijriLabelVal = '';
     rekapHariArr.forEach(k=>{
@@ -2898,7 +3028,7 @@ function renderPreviewDenganDiff(){
 }
 
 async function importGuru(){
-  if(!sb){ toast('Hubungkan Supabase!','err'); return; }
+  if(!sb){ toast('Hubungkan Neon!','err'); return; }
   if(!prevData.length) return;
 
   // Hanya proses data yang baru atau berbeda dari yang sudah ada
@@ -2942,7 +3072,7 @@ async function importGuru(){
     document.getElementById('prev-wrap').style.display='none';
     document.getElementById('file-excel').value=''; prevData=[];
   } catch(e){ toast('❌ '+e.message,'err'); }
-  finally{ btn.disabled=false; btn.innerHTML='⬆️ Simpan Perubahan ke Supabase'; }
+  finally{ btn.disabled=false; btn.innerHTML='⬆️ Simpan Perubahan ke Neon'; }
 }
 
 // ===== ANALISA GURU — berbasis kecepatan check-in =====
@@ -2971,7 +3101,7 @@ function getKategoriKecepatan(avgMenit) {
 }
 
 async function loadAnalisa(){
-  if(!sb){ toast('Hubungkan Supabase dulu!','err'); return; }
+  if(!sb){ toast('Hubungkan Neon dulu!','err'); return; }
   const hBulan = parseInt(document.getElementById('an-bulan').value);
   const hTahun = parseInt(document.getElementById('an-tahun').value);
 
@@ -3299,8 +3429,8 @@ function bukaSettings() {
   el('inf-tanggal').textContent  = todayMasehi();
   el('inf-ar').textContent       = cfg.ar;
   const sbOk = !!sb;
-  el('inf-supabase').className   = 'stt-conn-status ' + (sbOk ? 'ok' : 'no');
-  el('inf-supabase').textContent = sbOk ? '🟢 Terhubung' : '🔴 Tidak Terhubung';
+  el('inf-neon').className   = 'stt-conn-status ' + (sbOk ? 'ok' : 'no');
+  el('inf-neon').textContent = sbOk ? '🟢 Terhubung' : '🔴 Tidak Terhubung';
   el('st-conn-status').className = 'stt-conn-status ' + (sbOk ? 'ok' : 'no');
   el('st-conn-status').textContent = sbOk ? '🟢 Terhubung' : '🔴 Tidak Terhubung';
   document.getElementById('stt-overlay').classList.add('show');
@@ -3389,7 +3519,7 @@ async function testKoneksi() {
   stEl.className = 'stt-conn-status testing';
   stEl.textContent = '🟡 Menguji...';
   try {
-    if(!sb) throw new Error('Supabase belum diinisialisasi');
+    if(!sb) throw new Error('Neon belum diinisialisasi');
     const { error } = await sb.from('guru').select('id_pps').limit(1);
     if(error) throw error;
     stEl.className = 'stt-conn-status ok';
@@ -3406,7 +3536,7 @@ async function testKoneksi() {
 function downloadSQL() {
   const sql = `-- ================================================================
 -- SISTEM ABSENSI GURU — Idadiyah al-Miftah
--- Supabase SQL Setup — v5.0 (1 sesi per hari)
+-- Neon PostgreSQL Setup — v5.0 (1 sesi per hari)
 -- Diaudit langsung dari seluruh query di index.html
 --
 -- CARA PAKAI:
@@ -3496,22 +3626,13 @@ CREATE INDEX IF NOT EXISTS idx_absensi_idpps_tgl  ON absensi (id_pps, tanggal);
 
 
 -- ================================================================
--- BAGIAN 5 — ROW LEVEL SECURITY (RLS)
+-- BAGIAN 5 — CATATAN KEAMANAN (Neon)
+-- Di Neon, akses database dikontrol oleh Cloudflare Worker (worker.js).
+-- Row Level Security (RLS) tidak dipakai karena frontend tidak punya
+-- akses langsung ke database — semua query melewati Worker.
+-- Pastikan NEON_DATABASE_URL hanya disimpan sebagai Wrangler secret.
 -- ================================================================
-ALTER TABLE guru             ENABLE ROW LEVEL SECURITY;
-ALTER TABLE kalender_hijriah ENABLE ROW LEVEL SECURITY;
-ALTER TABLE sesi_absensi     ENABLE ROW LEVEL SECURITY;
-ALTER TABLE absensi          ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "anon_all_guru"      ON guru;
-DROP POLICY IF EXISTS "anon_all_kalender"  ON kalender_hijriah;
-DROP POLICY IF EXISTS "anon_all_sesi"      ON sesi_absensi;
-DROP POLICY IF EXISTS "anon_all_absensi"   ON absensi;
-
-CREATE POLICY "anon_all_guru"      ON guru             FOR ALL TO anon USING (true) WITH CHECK (true);
-CREATE POLICY "anon_all_kalender"  ON kalender_hijriah FOR ALL TO anon USING (true) WITH CHECK (true);
-CREATE POLICY "anon_all_sesi"      ON sesi_absensi     FOR ALL TO anon USING (true) WITH CHECK (true);
-CREATE POLICY "anon_all_absensi"   ON absensi          FOR ALL TO anon USING (true) WITH CHECK (true);
+-- (tidak ada perintah SQL di bagian ini)
 
 
 -- ================================================================
@@ -3557,7 +3678,7 @@ ORDER BY tablename;
   const blob = new Blob([sql], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'supabase_setup_v5.sql';
+  a.download = 'neon_setup.sql';
   a.click();
   URL.revokeObjectURL(a.href);
   toast('✅ File SQL berhasil diunduh!','suc');
@@ -3669,7 +3790,7 @@ function terapkanCheckinSettings(cfg) {
 
 // ===== BACKUP & EXPORT =====
 async function backupGuru() {
-  if(!sb) { toast('Supabase belum terhubung!','err'); return; }
+  if(!sb) { toast('Neon belum terhubung!','err'); return; }
   toast('⏳ Mengambil data guru...','');
   const { data, error } = await sb.from('guru').select('*').order('nama');
   if(error) { toast('❌ ' + error.message,'err'); return; }
@@ -3683,7 +3804,7 @@ async function backupGuru() {
 }
 
 async function backupAbsensi() {
-  if(!sb) { toast('Supabase belum terhubung!','err'); return; }
+  if(!sb) { toast('Neon belum terhubung!','err'); return; }
   toast('⏳ Mengambil data absensi...','');
   const { data, error } = await sb.from('absensi').select('*,guru(nama,dom,tingkatan)').order('created_at', {ascending:false});
   if(error) { toast('❌ ' + error.message,'err'); return; }
@@ -3700,7 +3821,7 @@ async function backupAbsensi() {
 }
 
 async function backupFull() {
-  if(!sb) { toast('Supabase belum terhubung!','err'); return; }
+  if(!sb) { toast('Neon belum terhubung!','err'); return; }
   toast('⏳ Menyiapkan full backup...','');
   try {
     const [rGuru, rAbsensi, rSesi] = await Promise.all([
@@ -3785,7 +3906,7 @@ function cekKonfirmasiReset() {
 }
 
 async function resetDatabase() {
-  if(!sb){ toast('Supabase belum terhubung!','err'); return; }
+  if(!sb){ toast('Neon belum terhubung!','err'); return; }
   const pilihan = {
     absensi  : document.getElementById('chk-absensi')?.checked,
     sesi     : document.getElementById('chk-sesi')?.checked,
