@@ -1913,7 +1913,8 @@ async function bukaSesi() {
     is_aktif: true,
     dibuka_pada: today(),
     dibuka_jam: dibuka_jam
-  }, { onConflict: 'tanggal_key' }).select().single();
+  }, { onConflict: 'tanggal_key' });
+  const { data: sesiBaru } = await sb.from('sesi_absensi').select('*').eq('tanggal_key', tglKey).single();
 
   if (sesiErr) { toast('❌ Gagal buka sesi: ' + sesiErr.message, 'err'); return; }
 
