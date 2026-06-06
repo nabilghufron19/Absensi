@@ -2467,16 +2467,17 @@ async function loadDashboard(){
   guruArr.forEach(g=>{
     g.tot = g.H+g.A+g.I+g.S;
     g.pct = g.tot>0 ? Math.round(g.H/g.tot*100) : 0;
-    g.avgMenit = g.selisihList && g.selisihList.length>0
+    g.avgMenit    = g.selisihList && g.selisihList.length>0
       ? Math.round(g.selisihList.reduce((a,b)=>a+b,0)/g.selisihList.length)
       : null;
+    g.medianMenit = medianArr(g.selisihList);
   });
 
   // Top 5 tercepat = avgMenit terkecil (harus punya data kecepatan dan minimal 1x hadir)
   // Tie-break: % hadir lebih tinggi lebih baik
   const top5Rajin = [...guruArr]
-    .filter(g => g.avgMenit !== null && g.H > 0)
-    .sort((a,b) => a.avgMenit - b.avgMenit || b.pct - a.pct)
+    .filter(g => g.medianMenit !== null && g.H > 0)
+    .sort((a,b) => a.medianMenit - b.medianMenit || b.pct - a.pct)
     .slice(0,5);
 
   // Fallback: jika tidak ada data kecepatan sama sekali, pakai % hadir
@@ -2490,7 +2491,7 @@ async function loadDashboard(){
   // Best guru untuk header card purple — selalu berbasis kecepatan
   if(top5Rajin.length>0){
     const best = top5Rajin[0];
-    _set('dsh-best-pct', fmtMenit(best.avgMenit) + ' rata-rata');
+    _set('dsh-best-pct', fmtMenit(best.medianMenit) + ' median');
     _set('dsh-best-nm', best.nama + ' · ' + best.H + 'x hadir');
   } else if(top5Fallback.length>0){
     const best = top5Fallback[0];
@@ -2500,6 +2501,7 @@ async function loadDashboard(){
 
   // Update subtitle Top 5
   const rSub = document.getElementById('dsh-top-rajin-sub');
+  if(rSub) rSub.textContent = 'median menit setelah sesi dibuka';
   if(rSub) rSub.textContent = pakaiKecepatan
     ? 'rata-rata menit check-in setelah sesi dibuka · ' + jmlSesi + ' sesi'
     : '⚠️ Data waktu belum tersedia — menampilkan % kehadiran';
@@ -2514,16 +2516,16 @@ async function loadDashboard(){
     : listToRender.map((g,i)=>{
         if(pakaiKecepatan){
           // Bar = makin kecil makin baik; normalkan ke guru tercepat
-          const maxMnt = listToRender[listToRender.length-1].avgMenit || 1;
-          const minMnt = listToRender[0].avgMenit || 0;
+          const maxMnt = listToRender[listToRender.length-1].medianMenit || 1;
+          const minMnt = listToRender[0].medianMenit || 0;
           // Bar penuh untuk tercepat, makin ke bawah makin pendek
-          const barPct = maxMnt === minMnt ? 100 : Math.round((1 - (g.avgMenit - minMnt)/(maxMnt - minMnt)) * 80 + 20);
-          const color = g.avgMenit<5?'#2e7d32':g.avgMenit<15?'#1565c0':g.avgMenit<30?'#e65100':'#c62828';
+          const barPct = maxMnt === minMnt ? 100 : Math.round((1 - (g.medianMenit - minMnt)/(maxMnt - minMnt)) * 80 + 20);
+          const color = g.medianMenit<5?'#2e7d32':g.medianMenit<15?'#1565c0':g.medianMenit<30?'#e65100':'#c62828';
           return `<div class="dsh-bar-row">
             <span style="font-size:15px;min-width:22px;text-align:center">${rankIcon(i)||('<span class="rank-badge rn" style="font-size:9px">'+(i+1)+'</span>')}</span>
             <span class="dsh-bar-nm" style="flex:1">${g.nama}</span>
             <div class="dsh-bar-bg" style="flex:0 0 70px"><div class="dsh-bar-fill" style="width:${barPct}%;background:${color}"></div></div>
-            <span class="dsh-bar-pct" style="color:${color};min-width:48px;font-size:11px">${fmtMenit(g.avgMenit)}</span>
+            <span class="dsh-bar-pct" style="color:${color};min-width:48px;font-size:11px">${fmtMenit(g.medianMenit)}</span>
           </div>`;
         } else {
           const color=g.pct>=80?'#2e7d32':g.pct>=60?'#ffa726':'#ef5350';
@@ -3093,6 +3095,15 @@ function fmtMenit(m) {
   return Math.floor(m/60) + 'j ' + (m%60) + 'mnt';
 }
 
+function medianArr(arr) {
+  if (!arr || arr.length === 0) return null;
+  const sorted = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 !== 0
+    ? sorted[mid]
+    : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
+}
+
 function getKategoriKecepatan(avgMenit) {
   if(avgMenit === null) return {label:'📵 Tanpa Data', cls:'pola-abu', score:0};
   if(avgMenit <  5)    return {label:'⚡ Sangat Cepat', cls:'pola-hijau', score:4};
@@ -3184,12 +3195,13 @@ async function loadAnalisa(){
       const pct = tot>0 ? Math.round(H/tot*100) : 0;
 
       // Statistik kecepatan
-      const avgMenit  = selisihList.length>0 ? Math.round(selisihList.reduce((a,b)=>a+b,0)/selisihList.length) : null;
-      const minMenit  = selisihList.length>0 ? Math.min(...selisihList) : null;
-      const maxMenit  = selisihList.length>0 ? Math.max(...selisihList) : null;
-      const kategori  = getKategoriKecepatan(avgMenit);
+      const avgMenit    = selisihList.length>0 ? Math.round(selisihList.reduce((a,b)=>a+b,0)/selisihList.length) : null;
+      const medianMenit = medianArr(selisihList);
+      const minMenit    = selisihList.length>0 ? Math.min(...selisihList) : null;
+      const maxMenit    = selisihList.length>0 ? Math.max(...selisihList) : null;
+      const kategori    = getKategoriKecepatan(medianMenit);
 
-      return {g, H, A, I, S, tot, pct, avgMenit, minMenit, maxMenit, kategori, selisihList};
+      return {g, H, A, I, S, tot, pct, avgMenit, medianMenit, minMenit, maxMenit, kategori, selisihList};
     });
 
     // 5. Simpan untuk export
@@ -3214,9 +3226,9 @@ async function loadAnalisa(){
 }
 
 function renderAnalisaSummary(){
-  // Paling rajin = rata-rata check-in TERCEPAT (avgMenit terkecil, harus punya data)
-  const punyaData = analisaResult.filter(r=>r.avgMenit!==null && r.H > 0);
-  const sortedByKecepatan = [...punyaData].sort((a,b)=>a.avgMenit-b.avgMenit);
+  // Paling rajin = median check-in TERCEPAT (lebih adil dari rata-rata, tidak terpengaruh 1 hari telat)
+  const punyaData = analisaResult.filter(r=>r.medianMenit!==null && r.H > 0);
+  const sortedByKecepatan = [...punyaData].sort((a,b)=>a.medianMenit-b.medianMenit);
   const top = sortedByKecepatan[0] || null;
 
   // Paling banyak absen
@@ -3225,12 +3237,12 @@ function renderAnalisaSummary(){
 
   // Paling telat = rata-rata menit tertinggi (yang punya data)
   const telatGuru = analisaResult.filter(r=>r.kategori.cls==='pola-merah').length;
-  const avgGlobal = punyaData.length>0 ? Math.round(punyaData.reduce((s,r)=>s+r.avgMenit,0)/punyaData.length) : null;
+  const avgGlobal = punyaData.length>0 ? Math.round(punyaData.reduce((s,r)=>s+r.medianMenit,0)/punyaData.length) : null;
   const avgPct    = analisaResult.length>0 ? Math.round(analisaResult.reduce((s,r)=>s+r.pct,0)/analisaResult.length) : 0;
 
   if(top){
     document.getElementById('an-top-nama').textContent = top.g.nama;
-    document.getElementById('an-top-pct').textContent  = fmtMenit(top.avgMenit)+' rata2 check-in · '+top.H+' sesi hadir';
+    document.getElementById('an-top-pct').textContent  = fmtMenit(top.medianMenit)+' median check-in · '+top.H+' sesi hadir';
   } else {
     // Fallback jika tidak ada data timing: pakai % hadir
     const fallback = [...analisaResult].sort((a,b)=>b.pct-a.pct)[0];
@@ -3252,15 +3264,15 @@ function renderAnalisaSummary(){
     {label:'30–59 mnt', min:30, max:59,  color:'#ef6c00', desc:'Lambat'},
     {label:'≥ 60 mnt',  min:60, max:9999,color:'#c62828', desc:'Sering Telat'},
   ];
-  const punyaAvg = analisaResult.filter(r=>r.avgMenit!==null);
-  const maxCount = Math.max(...bands.map(b=>punyaAvg.filter(r=>r.avgMenit>=b.min&&r.avgMenit<=b.max).length),1);
+  const punyaAvg = analisaResult.filter(r=>r.medianMenit!==null);
+  const maxCount = Math.max(...bands.map(b=>punyaAvg.filter(r=>r.medianMenit>=b.min&&r.medianMenit<=b.max).length),1);
 
   document.getElementById('an-chart-bars').innerHTML =
-    `<div style="font-size:11.5px;color:var(--abu);margin-bottom:8px">⏱ Distribusi rata-rata kecepatan check-in per guru · rata-rata global: <strong>${fmtMenit(avgGlobal)}</strong> setelah sesi dibuka</div>` +
+    `<div style="font-size:11.5px;color:var(--abu);margin-bottom:8px">⏱ Distribusi median kecepatan check-in per guru · median global: <strong>${fmtMenit(avgGlobal)}</strong> setelah sesi dibuka</div>` +
     bands.map(b=>{
-      const count = punyaAvg.filter(r=>r.avgMenit>=b.min&&r.avgMenit<=b.max).length;
+      const count = punyaAvg.filter(r=>r.medianMenit>=b.min&&r.medianMenit<=b.max).length;
       const pct   = Math.round(count/maxCount*100);
-      const names = punyaAvg.filter(r=>r.avgMenit>=b.min&&r.avgMenit<=b.max).map(r=>r.g.nama).join(', ');
+      const names = punyaAvg.filter(r=>r.medianMenit>=b.min&&r.medianMenit<=b.max).map(r=>r.g.nama).join(', ');
       return `<div style="display:flex;align-items:center;gap:10px;font-size:12px" title="${names||'Tidak ada'}">
         <div style="width:76px;text-align:right;color:var(--abu);flex-shrink:0;font-size:11px">${b.label}</div>
         <div style="flex:1;background:#f0ebe0;border-radius:4px;height:22px;overflow:hidden">
@@ -3271,8 +3283,8 @@ function renderAnalisaSummary(){
         <div style="width:40px;font-weight:700;color:${b.color}">${count}</div>
       </div>`;
     }).join('') +
-    (analisaResult.filter(r=>r.avgMenit===null).length>0
-      ? `<div style="font-size:11px;color:var(--abu);margin-top:8px">📵 ${analisaResult.filter(r=>r.avgMenit===null).length} guru tidak punya data kecepatan (sesi lama atau belum pernah hadir)</div>`
+    (analisaResult.filter(r=>r.medianMenit===null).length>0
+      ? `<div style="font-size:11px;color:var(--abu);margin-top:8px">📵 ${analisaResult.filter(r=>r.medianMenit===null).length} guru tidak punya data kecepatan (sesi lama atau belum pernah hadir)</div>`
       : '');
 }
 
@@ -3284,18 +3296,18 @@ function renderAnalisaTable(){
   if(sort==='pct-desc')     data.sort((a,b)=>b.pct-a.pct);
   else if(sort==='pct-asc') data.sort((a,b)=>a.pct-b.pct);
   else if(sort==='telat-desc') data.sort((a,b)=>{
-    // Urutkan: yang punya data dulu, terbesar avg menit paling atas
-    if(a.avgMenit===null && b.avgMenit===null) return 0;
-    if(a.avgMenit===null) return 1;
-    if(b.avgMenit===null) return -1;
-    return b.avgMenit - a.avgMenit;
+    // Urutkan: yang punya data dulu, terbesar median menit paling atas
+    if(a.medianMenit===null && b.medianMenit===null) return 0;
+    if(a.medianMenit===null) return 1;
+    if(b.medianMenit===null) return -1;
+    return b.medianMenit - a.medianMenit;
   });
   else if(sort==='cepat-asc') data.sort((a,b)=>{
-    // Tercepat di atas
-    if(a.avgMenit===null && b.avgMenit===null) return 0;
-    if(a.avgMenit===null) return 1;
-    if(b.avgMenit===null) return -1;
-    return a.avgMenit - b.avgMenit;
+    // Tercepat di atas (pakai median — lebih adil dari rata-rata)
+    if(a.medianMenit===null && b.medianMenit===null) return 0;
+    if(a.medianMenit===null) return 1;
+    if(b.medianMenit===null) return -1;
+    return a.medianMenit - b.medianMenit;
   });
   else if(sort==='alpha-desc') data.sort((a,b)=>b.A-a.A);
   else if(sort==='nama') data.sort((a,b)=>a.g.nama.localeCompare(b.g.nama));
@@ -3313,7 +3325,7 @@ function renderAnalisaTable(){
     const barColor = r.pct>=80?'#43a047':r.pct>=60?'#ffa726':'#ef5350';
 
     // Warna avg menit
-    const avgColor = r.avgMenit===null?'#ccc': r.avgMenit<5?'#2e7d32':r.avgMenit<15?'#1565c0':r.avgMenit<30?'#e65100':'#c62828';
+    const avgColor = r.medianMenit===null?'#ccc': r.medianMenit<5?'#2e7d32':r.medianMenit<15?'#1565c0':r.medianMenit<30?'#e65100':'#c62828';
 
     // Catatan otomatis
     let catatan = '';
@@ -3340,7 +3352,10 @@ function renderAnalisaTable(){
           <span style="font-weight:700;color:${barColor};font-size:12.5px">${r.pct}%</span>
         </div>
       </td>
-      <td style="text-align:center;font-weight:700;color:${avgColor};font-size:13px">${fmtMenit(r.avgMenit)}</td>
+      <td style="text-align:center;font-size:12px">
+        <div style="font-weight:700;color:${avgColor}">${fmtMenit(r.medianMenit)}</div>
+        <div style="font-size:10px;color:#aaa">avg: ${fmtMenit(r.avgMenit)}</div>
+      </td>
       <td style="text-align:center;font-size:12px;color:#2e7d32">${fmtMenit(r.minMenit)}</td>
       <td style="text-align:center;font-size:12px;color:#c62828">${fmtMenit(r.maxMenit)}</td>
       <td style="text-align:center"><span style="padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:700;${polaStyle[r.kategori.cls]}">${r.kategori.label}</span></td>
@@ -3363,7 +3378,7 @@ function exportAnalisaExcel(){
     return [
       i+1, r.g.id_pps, r.g.nama, r.g.dom||'', r.g.tingkatan||'',
       r.H, r.A, r.I, r.S, r.pct+'%',
-      r.avgMenit!==null ? r.avgMenit+' mnt' : '—',
+      r.medianMenit!==null ? r.medianMenit+' mnt (median)' : '—',
       r.minMenit!==null ? r.minMenit+' mnt' : '—',
       r.maxMenit!==null ? r.maxMenit+' mnt' : '—',
       r.kategori.label.replace(/[^\w\s%]/g,'').trim(),
