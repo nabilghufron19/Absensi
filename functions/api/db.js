@@ -27,14 +27,10 @@ export async function onRequestOptions() {
 }
 
 async function sqlQuery(dbUrl, query, params = []) {
-  // Pakai Neon HTTP API — tidak perlu npm package
-  const url = dbUrl.replace(/^postgresql:\/\//, 'https://').replace(/(\?.*)?$/, '');
-  // Parse connection string
   const match = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^/]+)\/(.+?)(\?.*)?$/);
   if (!match) throw new Error('Format DATABASE_URL tidak valid');
-  const [, user, password, host, database] = match;
-  const neonApiUrl = `https://${host}/sql`;
-  const res = await fetch(neonApiUrl, {
+  const [, , , host] = match;
+  const res = await fetch(`https://${host}/sql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -110,9 +106,12 @@ function unflatten(row) {
 }
 
 async function handleQuery(dbUrl, p) {
-  const {table,op,data,filters,order,limit,single,maybeSingle,ignoreDuplicates,onConflict,selectCols,inVals}=p;
+  const {table,op,data,filters,order,limit,single,maybeSingle,
+         ignoreDuplicates,onConflict,selectCols,inVals}=p;
   if (!ALLOWED.includes(table)) throw new Error('Tabel tidak diizinkan: '+table);
   const params=[];
+
+  // ── SELECT ──────────────────────────────────────────────────
   if (op==='select') {
     const {cols,joins}=parseSelect(table,selectCols);
     let q=`SELECT ${cols} FROM ${table}`;
@@ -124,48 +123,72 @@ async function handleQuery(dbUrl, p) {
     const rows=(await sqlQuery(dbUrl,q,params)).map(unflatten);
     return (single||maybeSingle)?(rows[0]??null):rows;
   }
+
+  // ── INSERT (bulk — satu query untuk semua rows) ──────────────
   if (op==='insert') {
-    const rows=Array.isArray(data)?data:[data];
-    const results=[];
-    for(const row of rows){
-      const keys=Object.keys(row);
-      const q=`INSERT INTO ${table} (${keys.map(san).join(',')}) VALUES (${keys.map((_,i)=>`$${i+1}`)}) RETURNING *`;
-      results.push(...await sqlQuery(dbUrl,q,keys.map(k=>row[k])));
-    }
-    return Array.isArray(data)?results:(results[0]??null);
+    const rows = Array.isArray(data) ? data : [data];
+    if (rows.length === 0) return [];
+
+    const keys = Object.keys(rows[0]);
+    // Build: INSERT INTO t (col1,col2) VALUES ($1,$2),($3,$4),... RETURNING *
+    const valueClauses = rows.map((row, ri) =>
+      `(${keys.map((_, ci) => `$${ri * keys.length + ci + 1}`).join(',')})`
+    );
+    const allParams = rows.flatMap(row => keys.map(k => row[k]));
+    const q = `INSERT INTO ${table} (${keys.map(san).join(',')}) VALUES ${valueClauses.join(',')} RETURNING *`;
+    const results = await sqlQuery(dbUrl, q, allParams);
+    return Array.isArray(data) ? results : (results[0] ?? null);
   }
+
+  // ── UPDATE ──────────────────────────────────────────────────
   if (op==='update') {
     const keys=Object.keys(data);
     const vals=keys.map(k=>data[k]);
     const set=keys.map((k,i)=>`${san(k)}=$${i+1}`).join(',');
     vals.forEach(v=>params.push(v));
     const w=buildWhere(filters,null,params);
-    return sqlQuery(dbUrl,`UPDATE ${table} SET ${set}${w?' WHERE '+w:''} RETURNING *`,params.slice(0,keys.length+(w?filters.length:0)));
+    return sqlQuery(dbUrl,`UPDATE ${table} SET ${set}${w?' WHERE '+w:''} RETURNING *`,params);
   }
+
+  // ── DELETE ──────────────────────────────────────────────────
   if (op==='delete') {
     const w=buildWhere(filters,null,params);
     return sqlQuery(dbUrl,`DELETE FROM ${table}${w?' WHERE '+w:''} RETURNING *`,params);
   }
+
+  // ── UPSERT (bulk) ────────────────────────────────────────────
   if (op==='upsert') {
     const rows=Array.isArray(data)?data:[data];
-    const results=[];
-    for(const row of rows){
-      const keys=Object.keys(row);
-      const ph=keys.map((_,i)=>`$${i+1}`).join(',');
-      let q=`INSERT INTO ${table} (${keys.map(san).join(',')}) VALUES (${ph})`;
-      if(onConflict){
-        const cc=onConflict.split(',').map(c=>san(c.trim())).join(',');
-        if(ignoreDuplicates)q+=` ON CONFLICT (${cc}) DO NOTHING`;
-        else{
-          const upd=keys.filter(k=>!onConflict.split(',').map(c=>c.trim()).includes(k)).map(k=>`${san(k)}=EXCLUDED.${san(k)}`).join(',');
-          if(upd)q+=` ON CONFLICT (${cc}) DO UPDATE SET ${upd}`;
-          else q+=` ON CONFLICT (${cc}) DO NOTHING`;
-        }
-      } else if(ignoreDuplicates) q+=' ON CONFLICT DO NOTHING';
-      q+=' RETURNING *';
-      results.push(...await sqlQuery(dbUrl,q,keys.map(k=>row[k])));
+    if (rows.length === 0) return [];
+
+    const keys = Object.keys(rows[0]);
+    const valueClauses = rows.map((row, ri) =>
+      `(${keys.map((_, ci) => `$${ri * keys.length + ci + 1}`).join(',')})`
+    );
+    const allParams = rows.flatMap(row => keys.map(k => row[k]));
+
+    let q = `INSERT INTO ${table} (${keys.map(san).join(',')}) VALUES ${valueClauses.join(',')}`;
+    if (onConflict) {
+      const cc = onConflict.split(',').map(c=>san(c.trim())).join(',');
+      if (ignoreDuplicates) {
+        q += ` ON CONFLICT (${cc}) DO NOTHING`;
+      } else {
+        const conflictKeys = onConflict.split(',').map(c=>c.trim());
+        const upd = keys
+          .filter(k => !conflictKeys.includes(k))
+          .map(k => `${san(k)}=EXCLUDED.${san(k)}`).join(',');
+        q += upd
+          ? ` ON CONFLICT (${cc}) DO UPDATE SET ${upd}`
+          : ` ON CONFLICT (${cc}) DO NOTHING`;
+      }
+    } else if (ignoreDuplicates) {
+      q += ' ON CONFLICT DO NOTHING';
     }
-    return Array.isArray(data)?results:(results[0]??null);
+    q += ' RETURNING *';
+
+    const results = await sqlQuery(dbUrl, q, allParams);
+    return Array.isArray(data) ? results : (results[0] ?? null);
   }
+
   throw new Error('Operasi tidak dikenal: '+op);
 }
